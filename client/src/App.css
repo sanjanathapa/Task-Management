@@ -1,0 +1,11 @@
+.App {
+  position: relative;
+  width: 100%; /* Ensure header spans the entire width */
+
+  /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); Optional: Add a shadow for elevation */
+}
+
+.header h1 {
+  margin: 0; /* Optional: Reset margin */
+}
+
