@@ -1,12 +1,14 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
-const taskSchema = new mongoose.Schema({
+const { Schema } = mongoose;
+
+const taskSchema = new Schema({
   teamLeadId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "teamLead", // Reference to the teamLead model
+    type: Schema.Types.ObjectId,
+    ref: "TeamLead", // Reference to the teamLead model
   },
   technologyId: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: "technology", // Reference to the technology model
   },
   task: {
@@ -14,10 +16,9 @@ const taskSchema = new mongoose.Schema({
     required: [true, "Enter task description"],
   },
   userId: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: "user", // Reference to the user model
   },
-
   createdAt: {
     type: Date,
     default: Date.now,
@@ -31,4 +32,4 @@ const taskSchema = new mongoose.Schema({
 //With this index in place, MongoDB will enforce uniqueness for the combination of "userId" and "technologyId"
 //fields in the "Task" collection, allowing you to create multiple tasks for the same user and the same
 //technology while preventing duplicate entries for the same combination.
-module.exports = mongoose.model("task", taskSchema);
+export default mongoose.model("task", taskSchema);

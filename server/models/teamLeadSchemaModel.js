@@ -1,22 +1,23 @@
-const mongoose = require("mongoose");
-const validator = require("validator");
-const bcrypt = require("bcryptjs");
+import mongoose from "mongoose";
+import validator from "validator";
+import bcrypt from "bcryptjs";
 
-const teamLeadSchema = new mongoose.Schema({
+const { Schema } = mongoose;
+
+const teamLeadSchema = new Schema({
   name: {
     type: String,
-    require: [true, "enter your name"],
+    required: [true, "enter your name"],
   },
-
   email: {
     type: String,
     unique: true,
-    require: [true, "enter your email"],
-    validate: [validator.isEmail, "Plese provide a valid email"],
+    required: [true, "enter your email"],
+    validate: [validator.isEmail, "Please provide a valid email"],
   },
   password: {
     type: String,
-    require: [true, "Please enter password"],
+    required: [true, "Please enter password"],
     minlength: 6,
   },
   role: {
@@ -24,28 +25,22 @@ const teamLeadSchema = new mongoose.Schema({
     enum: ["TL", "intern"],
     default: "TL",
   },
-  photo: String
+  photo: String,
 });
 
-teamLeadSchema.pre("save", function (next) {
-  // console.log("this is this----------------", this);
+teamLeadSchema.pre("save", async function (next) {
   if (this.isModified("password") || this.isNew) {
-    bcrypt.genSalt(15, (saltError, salt) => {
-      if (saltError) {
-        return next(saltError);
-      } else {
-        bcrypt.hash(this.password, salt, (error, hash) => {
-          if (error) {
-            return next(error);
-          }
-          this.password = hash;
-          next();
-        });
-      }
-    });
+    try {
+      const salt = await bcrypt.genSalt(15);
+      const hash = await bcrypt.hash(this.password, salt);
+      this.password = hash;
+      next();
+    } catch (error) {
+      next(error);
+    }
   } else {
     next();
   }
 });
 
-module.exports = mongoose.model("teamLead", teamLeadSchema);
+export default mongoose.model("TeamLead", teamLeadSchema);

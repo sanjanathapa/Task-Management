@@ -1,5 +1,5 @@
-const mongoose = require("mongoose");
-const validator = require("validator");
+import mongoose from "mongoose";
+import validator from "validator";
 
 const technologySchemaModel = new mongoose.Schema({
   technology: {
@@ -8,4 +8,4 @@ const technologySchemaModel = new mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model("technology", technologySchemaModel);
+export default mongoose.model("technology", technologySchemaModel);

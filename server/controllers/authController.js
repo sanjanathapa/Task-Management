@@ -1,11 +1,11 @@
-const User = require("../models/userSchemaModel");
-const { promisify } = require("util");
-const TeamLead = require("../models/teamLeadSchemaModel");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
+import User from "../models/userSchemaModel.js";
+import { promisify } from "util";
+import TeamLead from "../models/teamLeadSchemaModel.js";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 
 //to check authentication while login and will generate a token
-exports.login = async (req, res) => {
+export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
@@ -24,7 +24,9 @@ exports.login = async (req, res) => {
     }
 
     // Generate JWT token
-    const token = jwt.sign({ userId: user.email }, "secretkey", { expiresIn: "24h" });
+    const token = jwt.sign({ userId: user.email }, "secretkey", {
+      expiresIn: "24h",
+    });
 
     res.status(200).json({ message: "Login successful", user, token });
   } catch (error) {
@@ -33,13 +35,12 @@ exports.login = async (req, res) => {
 };
 
 //to protect the route or authorize
-exports.protect = async (req, res, next) => {
+export const protect = async (req, res, next) => {
   //1. Getting token and check if it's there
   let token;
   if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
     token = req.headers.authorization.split(" ")[1];
   }
-  console.log(req.headers.authorization.split(" ")[1]);
 
   if (!token) {
     return res.status(401).json({ message: "you are not logged in! Please login to get access" });
@@ -48,27 +49,29 @@ exports.protect = async (req, res, next) => {
   //2. Verification token
 
   const decoded = await promisify(jwt.verify)(token, "secretkey");
-  console.log(decoded, "----------------------------------------------------------------");
 
   //3. Check if user still exists
   const currentUser = await TeamLead.findOne({ email: decoded.userId });
   if (!currentUser) {
-    return res.status(401).json({ status: "fail", message: "The user belonging to this token does no longer exist!" });
+    return res.status(401).json({
+      status: "fail",
+      message: "The user belonging to this token does no longer exist!",
+    });
   }
 
   //Grant Access to Protected Route
   req.user = currentUser;
-  console.log("=====request user================", req.user);
   next();
 };
 
-exports.restrictTo = (...roless) => {
+export const restrictTo = (...roles) => {
   return (req, res, next) => {
-    if (!roless.includes(req.user.role)) {
+    if (!roles.includes(req.user.role)) {
       return res.status(403).json({
-        message: "Yor are not allowed for this action",
+        message: "You are not allowed for this action",
       });
     }
     next();
   };
 };
+

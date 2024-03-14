@@ -4,9 +4,8 @@ const extendedApi = api.injectEndpoints({
   endpoints: (builder) => ({
     deleteTask: builder.mutation({
       query: (id) => ({
-        url: `/deleteTask`,
+        url: `/task/${id}`,
         method: "DELETE",
-        params: { id },
       }),
     }),
   }),

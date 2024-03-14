@@ -1,8 +1,12 @@
-const mongoose = require( "mongoose" );
-const DB = "mongodb://localhost:27017/taskManagementdb"
+import mongoose from "mongoose";
 
-mongoose.connect( DB, {} ).then( () => {
-    console.log("successfully connected with db")
- } ).catch( (err) =>{
-    console.log("error in connection with db" + err)
-})
+const DB = "mongodb://localhost:27017/taskManagementdb";
+
+mongoose
+  .connect(DB, {})
+  .then(() => {
+    console.log("Successfully connected with the database");
+  })
+  .catch((err) => {
+    console.log("Error in connection with the database: " + err);
+  });

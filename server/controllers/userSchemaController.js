@@ -1,6 +1,6 @@
-const User = require("../models/userSchemaModel");
+import User from "../models/userSchemaModel.js";
 
-exports.createUser = async (req, res) => {
+export const createUser = async (req, res) => {
   const { name, email, empCode, designation, department } = req.body;
 
   if (!name || !email || !empCode || !designation || !department) {
@@ -13,7 +13,7 @@ exports.createUser = async (req, res) => {
   try {
     const preUser = await User.findOne({ email: email });
     if (preUser) {
-      throw new error("Member already exist");
+      throw new Error("Member already exists");
     } else {
       const newUser = await User.create({
         name,
@@ -25,7 +25,7 @@ exports.createUser = async (req, res) => {
 
       return res.status(200).json({
         status: "success",
-        message: "user created successfullly",
+        message: "user created successfully",
         newUser,
       });
     }
@@ -37,17 +37,18 @@ exports.createUser = async (req, res) => {
   }
 };
 
-
-
-exports.restrictTo = (...roless) => {
-  console.log(roless, "==================Rolessss============================================");
+export const restrictTo = (...roles) => {
+  console.log(
+    roles,
+    "==================Rolessss============================================",
+  );
   return (req, res, next) => {
     console.log(
       "-------------------.restrictTo---------middlea----------------------------------------------",
-      req.user.role
+      req.user.role,
     );
-    if (!roless.includes(req.user.role)) {
-      return next(new AppError("Yor are not allowed for this action", 403));
+    if (!roles.includes(req.user.role)) {
+      return next(new Error("You are not allowed for this action", 403));
     }
     next();
   };

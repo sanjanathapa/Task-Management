@@ -1,14 +1,14 @@
-const multer = require("multer");
-const TechSchema = require("../models/technologySchemaModel");
-const TeamLead = require("../models/teamLeadSchemaModel");
-const Task = require("../models/taskSchemaModel");
-const path = require("path");
-const fs = require("fs");
+import multer from "multer";
+import TechSchema from "../models/technologySchemaModel.js";
+import TeamLead from "../models/teamLeadSchemaModel.js";
+import Task from "../models/taskSchemaModel.js";
+import path from "path";
+import fs from "fs";
 
 const multerStorage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "D:\\nodefile"); //server par he rkhte hai waise
-    // cb(null, "public/img");
+    // cb(null, "D:\\nodefile"); //server par he rkhte hai waise
+    cb(null, "public/img");
   },
   filename: (req, file, cb) => {
     const ext = file.mimetype.split("/")[1];
@@ -32,7 +32,7 @@ const upload = multer({
 
 // exports.uploadUserPhoto = upload.single( "photo" );
 
-exports.uploadUserPhoto = async (req, res) => {
+export const uploadUserPhoto = async (req, res) => {
   const id = req.user._id;
   upload(req, res, async (err) => {
     console.log("rewwwwwwwwwwwwwwwwww", req.file);
@@ -40,7 +40,8 @@ exports.uploadUserPhoto = async (req, res) => {
       return res.status(400).json({ error: err.message });
     }
     const filePath = req.file.path;
-
+    console.log(filePath, ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+    const fileName = path.basename(filePath);
     try {
       // Find the TeamLead by ID
       const teamLead = await TeamLead.findById(id);
@@ -50,11 +51,12 @@ exports.uploadUserPhoto = async (req, res) => {
 
       // Save the updated document
       await teamLead.save();
+      // const imageUrl = `http://localhost:5000/images/${fileName}`;
 
       return res.status(200).json({
         status: "success",
         message: "created successfully",
-        filePath: filePath,
+        fileName,
       });
     } catch (error) {
       return res.status(500).json({ error: "Internal server error" });
@@ -62,98 +64,42 @@ exports.uploadUserPhoto = async (req, res) => {
   });
 };
 
-// exports.getPhoto = async (req, res) => {
-//   const { id } = req.query;
-//   console.log("id.................................", id);
-//   //65df2678b175692e6af1306f
-//   try {
-//     const teamLead = await TeamLead.findById({ _id: id });
-
-//     if (!teamLead) {
-//       return res.status(404).json({ error: "User not found" });
-//     }
-
-//     const filePath = teamLead.photo;
-//     console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", filePath);
-//     // Check if the file exists
-//     if (!filePath) {
-//       return res.status(404).json({ error: "File not found" });
-//     }
-
-//     // Extract the filename without the directory path
-//     const filename = path.basename(filePath);
-//     console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>");
-//     console.log(filename, "filename");
-
-//     const getFileExt = (ext) => {
-//       if (ext === ".png") {
-//         return "image/x-png";
-//       } else if (ext === ".jpeg" || ext === ".jpg") {
-//         return "image/jpeg";
-//       }
-//     };
-
-//     try {
-//       //to extract the file extension
-//       const fileExtension = path.extname(filePath);
-//       console.log("filepath>>>>>>>>>>>>>>>>>>>>>", fileExtension);
-//       const imageBuffer = await fs.promises.readFile(filePath);
-//       // const imageBuffer = await fs.readFile(path.join(filePath));
-//       res.setHeader("Content-Type", getFileExt(fileExtension));
-//       res.setHeader("Cache-Control", "no-cache");
-
-//       res.status(200).send(imageBuffer);
-//     } catch (error) {
-//       console.error("Error fetching profile image:", error);
-//       res.status(500).send("Internal Server Error");
-//     }
-//   } catch (error) {
-//     console.log("error>>>>>>>>>>>>>>>>>", error);
-//     return res.status(500).json({ error: "Internal sanjanaj server error" });
-//   }
-// };
-
-exports.getPhoto = async (req, res) => {
+export const getPhoto = async (req, res) => {
   try {
-    const { id } = req.query;
-
-    if (!id) {
-      return res.status(400).json({ error: "ID parameter is missing" });
-    }
+    const { id } = req.params;
+    console.log("response", id);
+    if (!id) return res.status(400).json({ error: "ID parameter is missing" });
 
     const teamLead = await TeamLead.findById(id);
-
-    if (!teamLead) {
-      return res.status(404).json({ error: "User not found" });
-    }
+    if (!teamLead) return res.status(404).json({ error: "User not found" });
 
     const filePath = teamLead.photo;
-
     if (!filePath) {
       return res.status(404).json({ error: "File not found" });
     }
 
     const fileExtension = path.extname(filePath);
+    const fileName = path.basename(filePath);
 
     if (![".png", ".jpg", ".jpeg"].includes(fileExtension)) {
       return res.status(415).json({ error: "Unsupported file format" });
     }
 
-    const imageStream = fs.createReadStream(filePath);
+    // const imageStream = fs.createReadStream(filePath);
 
     res.setHeader("Content-Type", `image/${fileExtension.slice(1)}`);
-    res.setHeader("Cache-Control", "no-cache");
-
-    imageStream.pipe(res);
+    res.setHeader( "Cache-Control", "no-cache" );
+    
+    const imageUrl = `http://localhost:5000/images/${fileName}`;
+    console.log(imageUrl);
+    return res.status(200).json({ status: "success", imageUrl });
   } catch (error) {
     console.error("Error fetching profile image:", error);
     return res.status(500).send("Internal Server Error");
   }
 };
 
-exports.createTeamLead = async (req, res) => {
-  console.log("jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj", req.body);
-  console.log("file upload>>>>>>>>>>", req.file);
+export const createTeamLead = async (req, res) => {
   const { name, email, password, role } = req.body;
   if (!name || !email || !password || !role) {
     return res.status(400).json({
@@ -188,7 +134,7 @@ exports.createTeamLead = async (req, res) => {
   }
 };
 
-exports.createTech = async (req, res) => {
+export const createTech = async (req, res) => {
   const { technology } = req.body;
   if (!technology) {
     return res.status(400).json({
@@ -214,7 +160,7 @@ exports.createTech = async (req, res) => {
   }
 };
 
-exports.getAllTech = async (req, res) => {
+export const getAllTech = async (req, res) => {
   try {
     const tasks = await TechSchema.find();
     return res.status(200).json({ status: "success", tasks });
@@ -223,9 +169,9 @@ exports.getAllTech = async (req, res) => {
   }
 };
 
-exports.deleteTech = async (req, res) => {
+export const deleteTech = async (req, res) => {
   try {
-    const id = req.query.id;
+    const id = req.params.id;
     const deletedTech = await TechSchema.findByIdAndDelete({ _id: id });
     if (!deletedTech) {
       return res.status(404).json({ message: "Task not found" });
@@ -237,11 +183,11 @@ exports.deleteTech = async (req, res) => {
   }
 };
 
-exports.updateTech = async (req, res) => {
-  console.log("sanjfajsfhjdfhdj", req.query);
+export const updateTech = async (req, res) => {
+  console.log("sanjfajsfhjdfhdj", req.params);
 
   try {
-    const { id } = req.query;
+    const { id } = req.params;
     console.log("snajnajnjnajnajnjnajnjnjjnjnjnjnjnj", id);
     const { technology } = req.body;
 
@@ -255,13 +201,17 @@ exports.updateTech = async (req, res) => {
       return res.status(404).json({ message: "Task not found" });
     }
 
-    return res.status(200).json({ status: "success", message: "Task updated successfully", updatedTask });
+    return res.status(200).json({
+      status: "success",
+      message: "Task updated successfully",
+      updatedTask,
+    });
   } catch (error) {
     return res.status(500).json({ status: "fail", message: error.message });
   }
 };
 
-exports.getAllTeamLeads = async (req, res) => {
+export const getAllTeamLeads = async (req, res) => {
   console.log(">>>>>>>>>>>>req");
   try {
     const teamLead = await TeamLead.find();
@@ -272,7 +222,7 @@ exports.getAllTeamLeads = async (req, res) => {
   }
 };
 
-exports.createTask = async (req, res) => {
+export const createTask = async (req, res) => {
   console.log("this is request for task>>>>>>>>>>>>>>>>>", req.user._id);
   try {
     const teamLeadId = req.user._id;
@@ -297,20 +247,19 @@ exports.createTask = async (req, res) => {
   }
 };
 
-exports.getAllTasks = async (req, res) => {
-  console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>req", req.user._id);
-
+export const getAllTasks = async (req, res) => {
   try {
     const tasks = await Task.find().populate("teamLeadId technologyId userId");
+    console.log("task>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", tasks);
     return res.status(200).json({ status: "success", tasks });
   } catch (error) {
     return res.status(500).json({ status: "fail", message: error.message });
   }
 };
 
-exports.updateTask = async (req, res) => {
+export const updateTask = async (req, res) => {
   try {
-    const { id } = req.query;
+    const { id } = req.params;
     console.log("snajnajnjnajnajnjnajnjnjjnjnjnjnjnj", req.body);
     const { task } = req.body;
     console.log("task>>>>>>>>>>>>>>>>>>>>>>", task);
@@ -324,15 +273,20 @@ exports.updateTask = async (req, res) => {
       return res.status(404).json({ message: "Task not found" });
     }
 
-    return res.status(200).json({ status: "success", message: "Task updated successfully", updatedTask });
+    return res.status(200).json({
+      status: "success",
+      message: "Task updated successfully",
+      updatedTask,
+    });
   } catch (error) {
     return res.status(500).json({ status: "fail", message: error.message });
   }
 };
 
-exports.deleteTask = async (req, res) => {
+export const deleteTask = async (req, res) => {
+  console.log("req.parmas.ID>>>>>>>>>>>>>>>>>>>>", req.params);
   try {
-    const id = req.query.id;
+    const id = req.params.id;
     const deletedTask = await Task.findByIdAndDelete({ _id: id });
     if (!deletedTask) {
       return res.status(404).json({ message: "Task not found" });
@@ -343,3 +297,4 @@ exports.deleteTask = async (req, res) => {
     return res.status(500).json({ status: "fail", message: error.message });
   }
 };
+

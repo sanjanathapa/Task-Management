@@ -1,18 +1,22 @@
-const express = require("express");
-const cors = require("cors");
+import express from "express";
+import cors from "cors";
+import methodOverride from "method-override";
+import routers from "./routes/taskRoute.js";
+import "./config/db.js";
+
 const app = express();
-require("./config/db");
-const methodOverride = require("method-override");
 app.use(methodOverride("_method"));
 
-const routers = require("./routes/taskRoute.js");
 const port = 5000;
 
-//middlewares
+// Middlewares
+// Serve static images
+app.use("/images", express.static("public/img"));
 app.use("*", cors());
 app.use(express.json());
 app.use("/api/v1", routers);
 
 app.listen(port, () => {
-  console.log(`server is listening on http://localhost: ${port}`);
+  console.log(`Server is listening on http://localhost:${port}`);
 });
+

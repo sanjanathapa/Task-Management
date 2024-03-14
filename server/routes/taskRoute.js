@@ -1,34 +1,52 @@
-const express = require("express");
-const techController = require("../controllers/techSchemaController");
-const userController = require("../controllers/userSchemaController");
-const authController = require("../controllers/authController");
+import express from "express";
+import {
+  createTask,
+  createTeamLead,
+  createTech,
+  deleteTask,
+  deleteTech,
+  getAllTasks,
+  getAllTeamLeads,
+  getAllTech,
+  getPhoto,
+  updateTask,
+  updateTech,
+  uploadUserPhoto,
+} from "../controllers/techSchemaController.js";
+import { createUser } from "../controllers/userSchemaController.js";
+import { login, protect, restrictTo } from "../controllers/authController.js";
 
 const router = express.Router();
-console.log(router.delete, ">>>>>>>>>>>>>>>>>");
+
+// console.log(router.delete, ">>>>>>>>>>>>>>>>>");
 
 //login
-router.post("/login", authController.login);
+router.post("/login", login);
 
 //route protection and authorization
-router.post("/createUser", authController.protect, authController.restrictTo("TL"), userController.createUser);
+router.post("/createUser", protect, restrictTo("TL"), createUser);
 
-//technology
-router.post("/technology", authController.protect, authController.restrictTo("TL"), techController.createTech);
-router.delete("/technology", authController.protect, authController.restrictTo("TL"), techController.deleteTech);
-router.get("/technology", authController.protect, techController.getAllTech);
-router.put("/technology", authController.protect, authController.restrictTo("TL"), techController.updateTech);
+// //technology
+router.post("/technology", protect, restrictTo("TL"), createTech);
+router.delete("/technology", protect, restrictTo("TL"), deleteTech);
+router.get("/technology", protect, getAllTech);
+router.put("/technology", protect, restrictTo("TL"), updateTech);
 
 // TL
-router.get("/teamLeads", techController.getAllTeamLeads);
-router.post("/createTeamLead", techController.uploadUserPhoto, techController.createTeamLead);
-router.post("/uploadfile", authController.protect, authController.restrictTo("TL"), techController.uploadUserPhoto);
-// router.route( "/profiles/:id" ).get( techController.getPhoto );
+router.get("/teamLeads", getAllTeamLeads);
+router.post("/createTeamLead", createTeamLead);
+router.post("/uploadfile", protect, restrictTo("TL"), uploadUserPhoto);
+// router.route("/profiles/:id").get(getPhoto);
+router.get("/profile/:id", protect, restrictTo("TL"), getPhoto);
 
-//Task create
-router.post("/task", authController.protect, authController.restrictTo("TL"), techController.createTask);
-router.get("/task", authController.protect, authController.restrictTo("TL"), techController.getAllTasks);
-router.put("/:id", authController.protect, authController.restrictTo("TL"), techController.updateTask);
-router.delete("/:id", authController.protect, authController.restrictTo("TL"), techController.deleteTask);
-router.get("/:id", authController.protect, authController.restrictTo("TL"), techController.getPhoto);
 
-module.exports = router;
+// //Task create
+router.post("/task", protect, restrictTo("TL"), createTask);
+router.get("/task", protect, restrictTo("TL"), getAllTasks);
+router.put("/task/:id", protect, restrictTo("TL"), updateTask);
+router.delete("/task/:id", protect, restrictTo("TL"), deleteTask);
+// router.get("/home", getPhoto);
+// router.get("/profile/:id", protect, restrictTo("TL"), getPhoto);
+
+export default router;
+
