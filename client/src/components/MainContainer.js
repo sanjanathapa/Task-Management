@@ -1,10 +1,10 @@
-import { ToastContainer, Zoom } from "react-toastify";
+// import { ToastContainer, Zoom } from "react-toastify";
 import Header from "./Header";
 
 import { TaskManagementCurrentUser } from "../utils/validations";
 import "react-toastify/dist/ReactToastify.css";
 import { Box, Typography } from "@mui/material";
-import { useEffect, useState } from "react";
+// import { useEffect, useState } from "react";
 
 const MainContainer = ({ children }) => {
   const { localStorageToken } = TaskManagementCurrentUser();

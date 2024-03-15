@@ -1,4 +1,4 @@
-import React, { useState, useReducer, useEffect } from "react";
+import React, { useState, useReducer, useEffect, useCallback } from "react";
 import Modal from "react-modal";
 import { useAddTaskMutation } from "../Api/AddTask";
 import { ToastContainer, toast } from "react-toastify";
@@ -45,11 +45,7 @@ const TaskLists = () => {
 
   const { technology, task, tableRowData, taskId } = localState;
 
-  useEffect(() => {
-    getTableData();
-  }, []);
-
-  const getTableData = () => {
+  const getTableData = useCallback(() => {
     getTaskLists()
       .unwrap()
       .then((res) => {
@@ -60,7 +56,12 @@ const TaskLists = () => {
         console.log("Sanjanaj??????????????????");
         handleError(error);
       });
-  };
+  }, [getTaskLists, localState]);
+
+  useEffect(() => {
+    getTableData();
+  }, [getTableData]);
+
   const handleTaskCreateModal = () => {
     // if (localStorage.getItem("token")) {
     //   setOpenModal(!openModal);
@@ -118,7 +119,11 @@ const TaskLists = () => {
   const handleEditClick = (item) => {
     console.log("id>>>>>>", item);
     setOpenModal(!openModal);
-    setLocalState({ technology: item.technology, task: item.task, taskId: item._id });
+    setLocalState({
+      technology: item.technology,
+      task: item.task,
+      taskId: item._id,
+    });
   };
 
   const handleModalClose = () => {
@@ -195,7 +200,11 @@ const TaskLists = () => {
                 required
                 onChange={onHandleChange}
                 placeholder="Enter technology name"
-                style={{ width: "100%", padding: "8px", boxSizing: "border-box" }}
+                style={{
+                  width: "100%",
+                  padding: "8px",
+                  boxSizing: "border-box",
+                }}
               />
             </div>
             <div style={{ marginBottom: "20px" }}>
@@ -208,7 +217,11 @@ const TaskLists = () => {
                 required
                 onChange={onHandleChange}
                 placeholder="Enter task"
-                style={{ width: "100%", padding: "8px", boxSizing: "border-box" }}
+                style={{
+                  width: "100%",
+                  padding: "8px",
+                  boxSizing: "border-box",
+                }}
               />
             </div>
             <div style={{ marginBottom: "20px" }}>
@@ -221,7 +234,11 @@ const TaskLists = () => {
                 required
                 onChange={onHandleChange}
                 placeholder="Enter task"
-                style={{ width: "100%", padding: "8px", boxSizing: "border-box" }}
+                style={{
+                  width: "100%",
+                  padding: "8px",
+                  boxSizing: "border-box",
+                }}
               />
             </div>
             <div style={{ marginBottom: "20px" }}>
@@ -234,14 +251,24 @@ const TaskLists = () => {
                 required
                 onChange={onHandleChange}
                 placeholder="Enter task"
-                style={{ width: "100%", padding: "8px", boxSizing: "border-box" }}
+                style={{
+                  width: "100%",
+                  padding: "8px",
+                  boxSizing: "border-box",
+                }}
               />
             </div>
             <div style={{ textAlign: "right" }}>
-              <button style={{ marginRight: "10px", padding: "8px 16px" }} onClick={handleSubmitTask}>
+              <button
+                style={{ marginRight: "10px", padding: "8px 16px" }}
+                onClick={handleSubmitTask}
+              >
                 Submit Task
               </button>
-              <button style={{ padding: "8px 16px" }} onClick={handleModalClose}>
+              <button
+                style={{ padding: "8px 16px" }}
+                onClick={handleModalClose}
+              >
                 Close
               </button>
             </div>
