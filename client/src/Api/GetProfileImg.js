@@ -4,9 +4,8 @@ const extendedApi = api.injectEndpoints({
   endpoints: (build) => ({
     getImage: build.query({
       query: (id) => {
-        console.log(id, "idddddddddddddddddddddddd");
         return {
-          url: `/profile?id=${id}`,
+          url: `/profile/${id}`,
           method: "GET",
         };
       },
