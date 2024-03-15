@@ -50,13 +50,17 @@ const TaskLists = () => {
       .unwrap()
       .then((res) => {
         console.log(res, "response of  getTasklist");
-        setLocalState({ ...localState, tableRowData: res.tasks });
+
+        setLocalState((prevState) => ({
+          ...prevState,
+          tableRowData: res.tasks,
+        }));
       })
       .catch((error) => {
         console.log("Sanjanaj??????????????????");
         handleError(error);
       });
-  }, [getTaskLists, localState]);
+  }, [getTaskLists]);
 
   useEffect(() => {
     getTableData();
