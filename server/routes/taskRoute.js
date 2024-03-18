@@ -39,7 +39,6 @@ router.post("/uploadfile", protect, restrictTo("TL"), uploadUserPhoto);
 // router.route("/profiles/:id").get(getPhoto);
 router.get("/profile/:id", protect, restrictTo("TL"), getPhoto);
 
-
 // //Task create
 router.post("/task", protect, restrictTo("TL"), createTask);
 router.get("/task", protect, restrictTo("TL"), getAllTasks);

@@ -24,7 +24,6 @@ const ProfilePhotoUpload = () => {
   const fetchImage = useCallback(async () => {
     try {
       const res = await getImage(user._id);
-
       setProfileImage(res.data.imageUrl);
     } catch (error) {
       console.log("error fetching image", error);

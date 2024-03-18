@@ -88,11 +88,16 @@ export const getPhoto = async (req, res) => {
     // const imageStream = fs.createReadStream(filePath);
 
     res.setHeader("Content-Type", `image/${fileExtension.slice(1)}`);
-    res.setHeader( "Cache-Control", "no-cache" );
-    
+    res.setHeader("Cache-Control", "no-cache");
+
     const imageUrl = `http://localhost:5000/images/${fileName}`;
     console.log(imageUrl);
-    return res.status(200).json({ status: "success", imageUrl });
+    // return res.status(200).json({ status: "success", imageUrl });
+    return res.status(200).json({
+      status: "success",
+      message: "created successfully",
+      imageUrl: imageUrl,
+    });
   } catch (error) {
     console.error("Error fetching profile image:", error);
     return res.status(500).send("Internal Server Error");

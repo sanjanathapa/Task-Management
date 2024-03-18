@@ -1,4 +1,4 @@
-import * as React from "react";
+import { useEffect, useState, useCallback } from "react";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
@@ -14,13 +14,17 @@ import MenuItem from "@mui/material/MenuItem";
 import AdbIcon from "@mui/icons-material/Adb";
 import { useNavigate } from "react-router-dom";
 import { handleLogout } from "../../utils/logout";
+import { useLazyGetImageQuery } from "../../Api/GetProfileImg";
 
 const pages = ["Task-Management", "Dashboard", "Blog"];
 const settings = ["Profile", "Account", "Dashboard", "Logout"];
 
 function Header() {
-  const [anchorElNav, setAnchorElNav] = React.useState(null);
-  const [anchorElUser, setAnchorElUser] = React.useState(null);
+  const [anchorElNav, setAnchorElNav] = useState(null);
+  const [anchorElUser, setAnchorElUser] = useState(null);
+  const [profileImage, setProfileImage] = useState(null);
+  const [getImage] = useLazyGetImageQuery();
+  const user = JSON.parse(localStorage.getItem("user"));
 
   const navigate = useNavigate();
 
@@ -48,7 +52,7 @@ function Header() {
         break;
 
       case "Dashboard":
-        navigate("/login");
+        navigate("/tasklists");
         break;
 
       case "Logout":
@@ -61,6 +65,20 @@ function Header() {
         break;
     }
   };
+
+  const fetchImage = useCallback(async () => {
+    try {
+      const res = await getImage(user._id);
+      console.log(res.data.imageUrl, "djfkdjfkdjfkdjf");
+      setProfileImage(res.data.imageUrl);
+    } catch (error) {
+      console.log("error fetching image", error);
+    }
+  }, [getImage, user._id]);
+
+  useEffect(() => {
+    fetchImage();
+  }, []);
 
   return (
     <AppBar position="static">
@@ -151,7 +169,7 @@ function Header() {
           <Box sx={{ flexGrow: 0 }}>
             <Tooltip title="Open settings">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar alt="S" src="/static/images/avatar/2.jpg" />
+                <Avatar alt="A" src={profileImage} />
               </IconButton>
             </Tooltip>
             <Menu

@@ -1,4 +1,5 @@
 import React, { useState, useReducer, useEffect, useCallback } from "react";
+import { TextField, Select, MenuItem, Button } from "@mui/material";
 import Modal from "react-modal";
 import { useAddTaskMutation } from "../Api/AddTask";
 import { ToastContainer, toast } from "react-toastify";
@@ -51,13 +52,13 @@ const TaskLists = () => {
       .then((res) => {
         console.log(res, "response of  getTasklist");
 
-        setLocalState((prevState) => ({
-          ...prevState,
-          tableRowData: res.tasks,
-        }));
+        // setLocalState((prevState) => ({
+        //   ...prevState,
+        //   tableRowData: res.tasks,
+        // }));
+        setLocalState({ tableRowData: res.tasks });
       })
       .catch((error) => {
-        console.log("Sanjanaj??????????????????");
         handleError(error);
       });
   }, [getTaskLists]);
@@ -66,6 +67,7 @@ const TaskLists = () => {
     getTableData();
   }, [getTableData]);
 
+  console.log(tableRowData, ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
   const handleTaskCreateModal = () => {
     // if (localStorage.getItem("token")) {
     //   setOpenModal(!openModal);
@@ -147,7 +149,7 @@ const TaskLists = () => {
       })
       .catch(handleError);
   };
-  console.log();
+
   return (
     <div>
       <div style={{ display: "flex", justifyContent: "center" }}>
@@ -185,8 +187,60 @@ const TaskLists = () => {
         >
           Add new task
         </button>
-
         <Modal
+  isOpen={openModal}
+  style={customStyles}
+  contentLabel="Example Modal"
+>
+  <div style={{ padding: "20px" }}>
+    <div style={{ marginBottom: "20px" }}>
+      {/* <Select
+        label="Technology"
+        value={technology}
+        onChange={onHandleChange}
+        fullWidth
+      >
+        <MenuItem value="Technology 1">Technology 1</MenuItem>
+        <MenuItem value="Technology 2">Technology 2</MenuItem>
+        <MenuItem value="Technology 3">Technology 3</MenuItem>
+      </Select> */}
+                <TextField
+        label="Technology"
+        value={task}
+        onChange={onHandleChange}
+        fullWidth
+        select
+      >
+        <MenuItem value="Task 1">Task 1</MenuItem>
+        <MenuItem value="Task 2">Task 2</MenuItem>
+        <MenuItem value="Task 3">Task 3</MenuItem>
+      </TextField>
+    </div>
+    <div style={{ marginBottom: "20px" }}>
+      <TextField
+        label="Task"
+        value={task}
+        onChange={onHandleChange}
+                fullWidth
+                select
+      />
+    </div>
+    <div style={{ textAlign: "right" }}>
+      <Button
+        variant="contained"
+        onClick={handleSubmitTask}
+        style={{ marginRight: "10px" }}
+      >
+        Submit Task
+      </Button>
+      <Button variant="contained" onClick={handleModalClose}>
+        Close
+      </Button>
+    </div>
+  </div>
+</Modal>
+
+        {/* <Modal
           isOpen={openModal}
           // onAfterOpen={afterOpenModal}
           // onRequestClose={closeModal}
@@ -195,8 +249,8 @@ const TaskLists = () => {
         >
           <div style={{ padding: "20px" }}>
             <div style={{ marginBottom: "20px" }}>
-              <label htmlFor="technologyInput">Technology Name:</label>
-              <input
+              {/* <label htmlFor="technologyInput">Technology Name:</label> */}
+              {/* <input
                 type="text"
                 id="technologyInput"
                 name="technology"
@@ -209,7 +263,14 @@ const TaskLists = () => {
                   padding: "8px",
                   boxSizing: "border-box",
                 }}
-              />
+              /> */}
+              {/* <Select
+                labelId="demo-simple-select-label"
+                id="demo-simple-select"
+                value={technology}
+                label="Technology"
+                onChange={onHandleChange}
+              ></Select>
             </div>
             <div style={{ marginBottom: "20px" }}>
               <label htmlFor="taskInput">Task:</label>
@@ -263,21 +324,15 @@ const TaskLists = () => {
               />
             </div>
             <div style={{ textAlign: "right" }}>
-              <button
-                style={{ marginRight: "10px", padding: "8px 16px" }}
-                onClick={handleSubmitTask}
-              >
+              <button style={{ marginRight: "10px", padding: "8px 16px" }} onClick={handleSubmitTask}>
                 Submit Task
               </button>
-              <button
-                style={{ padding: "8px 16px" }}
-                onClick={handleModalClose}
-              >
+              <button style={{ padding: "8px 16px" }} onClick={handleModalClose}>
                 Close
               </button>
             </div>
           </div>
-        </Modal>
+        </Modal> */} 
 
         <ToastContainer></ToastContainer>
       </div>
