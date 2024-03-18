@@ -85,11 +85,6 @@ export const getPhoto = async (req, res) => {
       return res.status(415).json({ error: "Unsupported file format" });
     }
 
-    // const imageStream = fs.createReadStream(filePath);
-
-    res.setHeader("Content-Type", `image/${fileExtension.slice(1)}`);
-    res.setHeader( "Cache-Control", "no-cache" );
-    
     const imageUrl = `http://localhost:5000/images/${fileName}`;
     console.log(imageUrl);
     return res.status(200).json({ status: "success", imageUrl });
@@ -177,7 +172,9 @@ export const deleteTech = async (req, res) => {
       return res.status(404).json({ message: "Task not found" });
     }
 
-    return res.status(200).json({ status: "success", message: "Task deleted successfully" });
+    return res
+      .status(200)
+      .json({ status: "success", message: "Task deleted successfully" });
   } catch (error) {
     return res.status(500).json({ status: "fail", message: error.message });
   }
@@ -192,10 +189,16 @@ export const updateTech = async (req, res) => {
     const { technology } = req.body;
 
     if (!technology) {
-      return res.status(400).json({ message: "Technology field required for update" });
+      return res
+        .status(400)
+        .json({ message: "Technology field required for update" });
     }
 
-    const updatedTech = await TechSchema.findByIdAndUpdate({ _id: id }, { technology }, { new: true });
+    const updatedTech = await TechSchema.findByIdAndUpdate(
+      { _id: id },
+      { technology },
+      { new: true },
+    );
 
     if (!updatedTech) {
       return res.status(404).json({ message: "Task not found" });
@@ -243,7 +246,9 @@ export const createTask = async (req, res) => {
     // Send back the whole response with populated fields
     res.status(201).json({ success: true, data: newTask });
   } catch (err) {
-    res.status(500).json({ success: false, message: "try again", error: err.message });
+    res
+      .status(500)
+      .json({ success: false, message: "try again", error: err.message });
   }
 };
 
@@ -264,10 +269,16 @@ export const updateTask = async (req, res) => {
     const { task } = req.body;
     console.log("task>>>>>>>>>>>>>>>>>>>>>>", task);
     if (!task) {
-      return res.status(400).json({ message: "Task field required for update" });
+      return res
+        .status(400)
+        .json({ message: "Task field required for update" });
     }
 
-    const updatedTask = await Task.findByIdAndUpdate({ _id: id }, { task }, { new: true });
+    const updatedTask = await Task.findByIdAndUpdate(
+      { _id: id },
+      { task },
+      { new: true },
+    );
     console.log("updateTask>>>>>>>>>>>>>", updatedTask);
     if (!updatedTask) {
       return res.status(404).json({ message: "Task not found" });
@@ -292,9 +303,10 @@ export const deleteTask = async (req, res) => {
       return res.status(404).json({ message: "Task not found" });
     }
 
-    return res.status(200).json({ status: "success", message: "Task deleted successfully" });
+    return res
+      .status(200)
+      .json({ status: "success", message: "Task deleted successfully" });
   } catch (error) {
     return res.status(500).json({ status: "fail", message: error.message });
   }
 };
-

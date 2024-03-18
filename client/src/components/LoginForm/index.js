@@ -1,21 +1,29 @@
 import React, { useReducer } from "react";
-import { Button, TextField, Typography, Paper, Container } from "@mui/material";
-import { ToastContainer, toast } from "react-toastify";
+import {
+  Button,
+  TextField,
+  Typography,
+  Paper,
+  Container,
+  CircularProgress,
+} from "@mui/material";
 import { useLoginMutation } from "../../Api/Login";
 import { handleError } from "../../utils/handleError";
 import { useNavigate } from "react-router-dom";
 import { loginStore } from "../../slices/loginSlice";
 import { useDispatch } from "react-redux";
+import { toast } from "react-toastify";
 
 const LoginForm = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const [loginUser, result] = useLoginMutation();
+  const [loginUser, { isLoading }] = useLoginMutation();
+
   const [localState, setLocalState] = useReducer(
     (prevState, newState) => {
       return { ...prevState, ...newState };
     },
-    { email: "", password: "" }
+    { email: "", password: "" },
   );
 
   const { email, password } = localState;
@@ -34,7 +42,6 @@ const LoginForm = () => {
         .then((response) => {
           const token = response.token;
           const user = response.user;
-          console.log("tokennnnnnnnnnnnnnnnnnnnn>>>>>>>>>>>>>>>>>", response.user);
 
           localStorage.setItem("token", token);
           localStorage.setItem("user", JSON.stringify(user));
@@ -57,7 +64,13 @@ const LoginForm = () => {
 
   return (
     <Container maxWidth="xs" style={{ marginTop: "50px" }}>
-      <Paper elevation={3} sx={{ padding: "50px", boxShadow: "10px 10px 30px -10px rgba(0,0,0,0.3)" }}>
+      <Paper
+        elevation={3}
+        sx={{
+          padding: "50px",
+          boxShadow: "10px 10px 30px -10px rgba(0,0,0,0.3)",
+        }}
+      >
         <Typography variant="h4" gutterBottom>
           Login
         </Typography>
@@ -84,11 +97,22 @@ const LoginForm = () => {
             margin="normal"
             variant="standard"
           />
-          <Button type="submit" variant="contained" color="primary" fullWidth sx={{ marginTop: "20px" }}>
-            Login
+          <Button
+            type="submit"
+            variant="contained"
+            color="primary"
+            fullWidth
+            className="d-flex"
+            sx={{ marginTop: "20px" }}
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <CircularProgress size={25} sx={{ scale: 0.2 }} />
+            ) : (
+              "Login"
+            )}
           </Button>
         </form>
-        <ToastContainer />
       </Paper>
     </Container>
   );
