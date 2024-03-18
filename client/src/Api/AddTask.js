@@ -4,7 +4,7 @@ const extendedApi = api.injectEndpoints({
   endpoints: (build) => ({
     addTask: build.mutation({
       query: (data) => ({
-        url: "/createTask",
+        url: "/task",
         method: "POST",
         body: data,
       }),

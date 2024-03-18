@@ -5,17 +5,21 @@ import { api } from "../Api/index";
 import { persistStore, persistReducer } from "redux-persist";
 
 const persistConfig = {
-    key: "root",
-    storage,
-  };
+  key: "root",
+  storage,
 
-  const persistedReducer = persistReducer(persistConfig, rootReducers);
+  serialize: false,
+};
 
-const store = configureStore( {
-    reducer: persistedReducer,
-    middleware: ( defaultMiddleware ) => [
-        ...defaultMiddleware( { serializableCheck: false } ), api.middleware ]
-} );
+const persistedReducer = persistReducer(persistConfig, rootReducers);
+
+const store = configureStore({
+  reducer: persistedReducer,
+
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({ serializableCheck: false }).concat(api.middleware),
+  devTools: process.env.NODE_ENV !== "production",
+});
 
 const persistor = persistStore(store);
 

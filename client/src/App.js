@@ -2,7 +2,7 @@ import "./App.css";
 import "react-toastify/dist/ReactToastify.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Provider } from "react-redux";
-import { store, persistor } from "./store";
+import { persistor, store } from "./store";
 import { BrowserRouter as Router } from "react-router-dom";
 import history from "./providers/history";
 import { PersistGate } from "redux-persist/integration/react";

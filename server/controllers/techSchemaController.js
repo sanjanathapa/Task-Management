@@ -86,10 +86,6 @@ export const getPhoto = async (req, res) => {
     }
 
     // const imageStream = fs.createReadStream(filePath);
-
-    res.setHeader("Content-Type", `image/${fileExtension.slice(1)}`);
-    res.setHeader("Cache-Control", "no-cache");
-
     const imageUrl = `http://localhost:5000/images/${fileName}`;
     console.log(imageUrl);
     // return res.status(200).json({ status: "success", imageUrl });

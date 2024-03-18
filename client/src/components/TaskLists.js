@@ -1,10 +1,10 @@
-import React, { useState, useReducer, useEffect, useCallback } from "react";
-import { TextField, Select, MenuItem, Button } from "@mui/material";
+import React, { useState, useReducer } from "react";
+import { TextField, select, MenuItem, Button } from "@mui/material";
 import Modal from "react-modal";
 import { useAddTaskMutation } from "../Api/AddTask";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import { handleError } from "../utils/handleError";
-import { useLazyGetTaskQuery } from "../Api/GetTaskLists";
+import { useGetTaskQuery } from "../Api/GetTaskLists";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import { useDeleteTaskMutation } from "../Api/DeleteTask";
@@ -12,6 +12,7 @@ import { useUpdateTaskMutation } from "../Api/UpdateTask.js";
 import "../components/tablec.css";
 import "../App.css";
 import { get } from "lodash";
+import { CircularProgress } from "@mui/material";
 
 const customStyles = {
   content: {
@@ -27,8 +28,8 @@ const customStyles = {
 const TaskLists = () => {
   const [openModal, setOpenModal] = useState(false);
 
+  const { data, isLoading, refetch: getTableData } = useGetTaskQuery();
   const [addTask] = useAddTaskMutation();
-  const [getTaskLists] = useLazyGetTaskQuery();
   const [deleteTask] = useDeleteTaskMutation();
   const [updateTask] = useUpdateTaskMutation();
 
@@ -39,35 +40,11 @@ const TaskLists = () => {
     {
       technology: "",
       task: "",
-      tableRowData: [],
       taskId: "",
-    }
+    },
   );
 
-  const { technology, task, tableRowData, taskId } = localState;
-
-  const getTableData = useCallback(() => {
-    getTaskLists()
-      .unwrap()
-      .then((res) => {
-        console.log(res, "response of  getTasklist");
-
-        // setLocalState((prevState) => ({
-        //   ...prevState,
-        //   tableRowData: res.tasks,
-        // }));
-        setLocalState({ tableRowData: res.tasks });
-      })
-      .catch((error) => {
-        handleError(error);
-      });
-  }, [getTaskLists]);
-
-  useEffect(() => {
-    getTableData();
-  }, [getTableData]);
-
-  console.log(tableRowData, ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+  const { technology, task, taskId } = localState;
   const handleTaskCreateModal = () => {
     // if (localStorage.getItem("token")) {
     //   setOpenModal(!openModal);
@@ -150,10 +127,21 @@ const TaskLists = () => {
       .catch(handleError);
   };
 
+  if (isLoading) return <CircularProgress sx={{ color: "black" }} />;
   return (
     <div>
+      <button
+        className="d-flex mx-auto my-3"
+        onClick={(e) => {
+          resetState();
+          handleTaskCreateModal(e);
+        }}
+      >
+        Add new task
+      </button>
+
       <div style={{ display: "flex", justifyContent: "center" }}>
-        <table style={{ width: "80%", border: "100px" }}>
+        <table style={{ width: "80%", border: "100px" }} key={1}>
           <tbody>
             <tr>
               <th>Task Created By</th>
@@ -163,8 +151,8 @@ const TaskLists = () => {
               <th>Delete</th>
               <th>Edit</th>
             </tr>
-            {tableRowData.map((item) => (
-              <tr key={item.id}>
+            {data?.tasks?.map((item, i) => (
+              <tr key={i}>
                 <td>{get(item, "teamLeadId.name", "")}</td>
                 <td>{get(item, "technologyId.technology", "")}</td>
                 <td>{get(item, "task", "")}</td>
@@ -179,14 +167,6 @@ const TaskLists = () => {
             ))}
           </tbody>
         </table>
-        <button
-          onClick={(e) => {
-            resetState();
-            handleTaskCreateModal(e);
-          }}
-        >
-          Add new task
-        </button>
         <Modal
   isOpen={openModal}
   style={customStyles}
@@ -333,8 +313,6 @@ const TaskLists = () => {
             </div>
           </div>
         </Modal> */} 
-
-        <ToastContainer></ToastContainer>
       </div>
     </div>
   );

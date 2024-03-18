@@ -1,38 +1,23 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React from "react";
 import { useUploadImageMutation } from "../../Api/UploadImage";
 import { FormControl } from "react-bootstrap";
 import { toast } from "react-toastify";
 import { handleError } from "../../utils/handleError";
-import { Box } from "@mui/material";
-import { useLazyGetImageQuery } from "../../Api/GetProfileImg";
+import { Box, CircularProgress } from "@mui/material";
+import { useGetImageQuery } from "../../Api/GetProfileImg";
+import { TaskManagementCurrentUser } from "../../utils/validations";
 
 const ProfilePhotoUpload = () => {
-  //first extact the current logged in user
-  const user = JSON.parse(localStorage.getItem("user"));
+  const { user } = TaskManagementCurrentUser();
 
-  const [profileImage, setProfileImage] = useState(null);
-
-  const [uploadProfile] = useUploadImageMutation();
-  const [getImage] = useLazyGetImageQuery();
+  const [uploadProfile, { isLoading }] = useUploadImageMutation();
+  const { data: profile, refetch } = useGetImageQuery(user._id);
 
   const onFileChange = (e) => {
     const file = e.target.files[0];
 
     handlePhoto(file);
   };
-
-  const fetchImage = useCallback(async () => {
-    try {
-      const res = await getImage(user._id);
-      setProfileImage(res.data.imageUrl);
-    } catch (error) {
-      console.log("error fetching image", error);
-    }
-  }, [getImage, user._id]);
-
-  useEffect(() => {
-    fetchImage();
-  }, [fetchImage]);
 
   const handlePhoto = (uploadImage) => {
     if (uploadImage) {
@@ -42,7 +27,7 @@ const ProfilePhotoUpload = () => {
       uploadProfile(formData)
         .then((res) => {
           toast.success(res.data.message ?? "Image uplaoded successfully");
-          fetchImage();
+          refetch();
         })
         .catch((error) => {
           handleError(error);
@@ -54,7 +39,7 @@ const ProfilePhotoUpload = () => {
     <div className="container">
       <Box
         component="img"
-        src={profileImage}
+        src={profile?.imageUrl}
         sx={{
           height: "200px",
           width: "200px",
@@ -70,7 +55,12 @@ const ProfilePhotoUpload = () => {
           style={{ display: "none" }}
           onChange={onFileChange}
         />
-        {user.photo ? "Edit Profile" : "Add Profile"}
+
+        {isLoading ? (
+          <CircularProgress size={25} sx={{ scale: 0.2, color: "white" }} />
+        ) : (
+          <>{user.photo ? "Edit Profile" : "Add Profile"}</>
+        )}
       </label>
     </div>
   );
@@ -78,7 +68,7 @@ const ProfilePhotoUpload = () => {
 
 export default ProfilePhotoUpload;
 
-// const [getImage] = useLazyGetImageQuery();
+// const [getImage] = useGetImageQuery();
 
 // const fetchProfileImage = async (id) => {
 //   try {

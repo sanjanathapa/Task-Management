@@ -12,4 +12,4 @@ const extendedApi = api.injectEndpoints({
     }),
   }),
 });
-export const { useLazyGetImageQuery } = extendedApi;
+export const { useGetImageQuery } = extendedApi;

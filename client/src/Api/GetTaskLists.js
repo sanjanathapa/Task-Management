@@ -10,4 +10,4 @@ const extendedApi = api.injectEndpoints({
     }),
   }),
 });
-export const { useLazyGetTaskQuery } = extendedApi;
+export const { useGetTaskQuery } = extendedApi;
