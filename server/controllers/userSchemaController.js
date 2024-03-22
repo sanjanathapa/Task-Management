@@ -38,14 +38,11 @@ export const createUser = async (req, res) => {
 };
 
 export const restrictTo = (...roles) => {
-  console.log(
-    roles,
-    "==================Rolessss============================================",
-  );
+  console.log(roles, "==================Rolessss============================================");
   return (req, res, next) => {
     console.log(
       "-------------------.restrictTo---------middlea----------------------------------------------",
-      req.user.role,
+      req.user.role
     );
     if (!roles.includes(req.user.role)) {
       return next(new Error("You are not allowed for this action", 403));
@@ -53,3 +50,13 @@ export const restrictTo = (...roles) => {
     next();
   };
 };
+
+export const getAllUsers = async (req, res) => {
+  try {
+    const user = await User.find();
+    return res.status(200).json({ status: "success", user });
+  } catch (error) {
+    return res.status(500).json({ status: "fail", message: error.message });
+  }
+};
+

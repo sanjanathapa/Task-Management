@@ -14,7 +14,7 @@ import MenuItem from "@mui/material/MenuItem";
 import AdbIcon from "@mui/icons-material/Adb";
 import { useNavigate } from "react-router-dom";
 import { handleLogout } from "../../utils/logout";
-import { useLazyGetImageQuery } from "../../Api/GetProfileImg";
+// import { useGetImageQuery } from "../../Api/GetProfileImg";
 
 const pages = ["Task-Management", "Dashboard", "Blog"];
 const settings = ["Profile", "Account", "Dashboard", "Logout"];
@@ -22,9 +22,9 @@ const settings = ["Profile", "Account", "Dashboard", "Logout"];
 function Header() {
   const [anchorElNav, setAnchorElNav] = useState(null);
   const [anchorElUser, setAnchorElUser] = useState(null);
-  const [profileImage, setProfileImage] = useState(null);
-  const [getImage] = useLazyGetImageQuery();
-  const user = JSON.parse(localStorage.getItem("user"));
+  // const [profileImage, setProfileImage] = useState(null);
+  // const [getImage] = useGetImageQuery();
+  // const user = JSON.parse(localStorage.getItem("user"));
 
   const navigate = useNavigate();
 
@@ -66,18 +66,18 @@ function Header() {
     }
   };
 
-  const fetchImage = useCallback(async () => {
-    try {
-      const res = await getImage(user._id);
-      console.log(res.data.imageUrl, "djfkdjfkdjfkdjf");
-      setProfileImage(res.data.imageUrl);
-    } catch (error) {
-      console.log("error fetching image", error);
-    }
-  }, [getImage, user._id]);
+  // const fetchImage = useCallback(async () => {
+  //   try {
+  //     const res = await getImage(user._id);
+  //     console.log(res.data.imageUrl, "djfkdjfkdjfkdjf");
+  //     setProfileImage(res.data.imageUrl);
+  //   } catch (error) {
+  //     console.log("error fetching image", error);
+  //   }
+  // }, [getImage, user._id]);
 
   useEffect(() => {
-    fetchImage();
+    // fetchImage();
   }, []);
 
   return (
@@ -160,11 +160,7 @@ function Header() {
           </Typography>
           <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
             {pages.map((page) => (
-              <Button
-                key={page}
-                onClick={handleCloseNavMenu}
-                sx={{ my: 2, color: "white", display: "block" }}
-              >
+              <Button key={page} onClick={handleCloseNavMenu} sx={{ my: 2, color: "white", display: "block" }}>
                 {page}
               </Button>
             ))}
@@ -173,7 +169,7 @@ function Header() {
           <Box sx={{ flexGrow: 0 }}>
             <Tooltip title="Open settings">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar alt="A" src={profileImage} />
+                <Avatar alt="A" />
               </IconButton>
             </Tooltip>
             <Menu
@@ -193,10 +189,7 @@ function Header() {
               onClose={handleCloseUserMenu}
             >
               {settings.map((setting) => (
-                <MenuItem
-                  key={setting}
-                  onClick={() => handleCloseUserMenu(setting)}
-                >
+                <MenuItem key={setting} onClick={() => handleCloseUserMenu(setting)}>
                   <Typography textAlign="center">{setting}</Typography>
                 </MenuItem>
               ))}

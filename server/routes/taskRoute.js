@@ -9,11 +9,12 @@ import {
   getAllTeamLeads,
   getAllTech,
   getPhoto,
+  search,
   updateTask,
   updateTech,
   uploadUserPhoto,
 } from "../controllers/techSchemaController.js";
-import { createUser } from "../controllers/userSchemaController.js";
+import { createUser, getAllUsers } from "../controllers/userSchemaController.js";
 import { login, protect, restrictTo } from "../controllers/authController.js";
 
 const router = express.Router();
@@ -24,7 +25,8 @@ const router = express.Router();
 router.post("/login", login);
 
 //route protection and authorization
-router.post("/createUser", protect, restrictTo("TL"), createUser);
+router.post( "/createUser", protect, restrictTo( "TL" ), createUser );
+router.get("/user", protect, restrictTo("TL"), getAllUsers);
 
 // //technology
 router.post("/technology", protect, restrictTo("TL"), createTech);
@@ -40,8 +42,10 @@ router.get("/profile/:id", protect, restrictTo("TL"), getPhoto);
 
 // //Task create
 router.post("/task", protect, restrictTo("TL"), createTask);
-router.get("/task", protect, restrictTo("TL"), getAllTasks);
+router.get("/task", protect, getAllTasks);
 router.put("/task/:id", protect, restrictTo("TL"), updateTask);
-router.delete("/task/:id", protect, restrictTo("TL"), deleteTask);
+router.delete( "/task/:id", protect, restrictTo( "TL" ), deleteTask );
+
+// router.get("/search", search)
 
 export default router;

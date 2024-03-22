@@ -3,7 +3,7 @@ import TechSchema from "../models/technologySchemaModel.js";
 import TeamLead from "../models/teamLeadSchemaModel.js";
 import Task from "../models/taskSchemaModel.js";
 import path from "path";
-import fs from "fs";
+import User from "../models/userSchemaModel.js";
 
 const multerStorage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -144,14 +144,14 @@ export const createTech = async (req, res) => {
   }
 
   try {
-    const newTask = await TechSchema.create({
+    const newTech = await TechSchema.create({
       technology,
     });
 
     return res.status(200).json({
       status: "success",
       message: "technology successfully created",
-      newTask,
+      newTech,
     });
   } catch (error) {
     return res.status(404).json({
@@ -163,8 +163,8 @@ export const createTech = async (req, res) => {
 
 export const getAllTech = async (req, res) => {
   try {
-    const tasks = await TechSchema.find();
-    return res.status(200).json({ status: "success", tasks });
+    const technologies = await TechSchema.find();
+    return res.status(200).json({ status: "success", technologies });
   } catch (error) {
     return res.status(500).json({ status: "fail", message: error.message });
   }
@@ -228,8 +228,6 @@ export const createTask = async (req, res) => {
   try {
     const teamLeadId = req.user._id;
     console.log("teamLeadEmail>>>>>>>>>>>>>>>>>>>", teamLeadId);
-    //65ddb4fa5f5fab88495ff551  //65ddb530c34f815f32c6a526 //65ddb549036dcf03203c3933
-    //65dc68a37fa5c4b61908cb5d
     // Create a new task document
     console.log("sanjanjannnnnnnnnnnnn", req.body);
     const newTask = await Task.create({
@@ -248,10 +246,64 @@ export const createTask = async (req, res) => {
   }
 };
 
+// export const getAllTasks = async (req, res) => {
+//   //get the value from query param
+//   const { name, technology } = req.query;
+//   console.log(req.query, "jkjkjk")
+//   let term = {};
+//   console.log(term , "term")
+//   if (name) {
+//     term.name = name;
+//   }
+//   if (technology) {
+//     term.technology = technology;
+//   }
+
+//   console.log(term);
+//   try {
+//     const tasks = await Task.find(term).populate("teamLeadId technologyId userId");
+//     console.log("task>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", tasks);
+//     return res.status(200).json({ status: "success", tasks });
+//   } catch (error) {
+//     return res.status(500).json({ status: "fail", message: error.message });
+//   }
+// };
+
 export const getAllTasks = async (req, res) => {
   try {
-    const tasks = await Task.find().populate("teamLeadId technologyId userId");
-    console.log("task>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", tasks);
+    // Get the value from the query parameter
+    const { name, technology } = req.query;
+    // Checking if req.query is empty
+    if (Object.keys(req.query).length === 0) {
+      // Fetching all task if query object khaali
+      const tasks = await Task.find().populate("teamLeadId technologyId userId");
+      return res.status(200).json({ status: "success", tasks });
+    }
+    console.log(technology, "000000000000000000000000000000000");
+    // Find team lead, user, and technology documents that match the query
+    const [teamLeads, users, technologies] = await Promise.all([
+      TeamLead.find({ name: name }),
+      User.find({ name: name }),
+      TechSchema.find({ technology: technology }),
+    ]);
+
+    // Extract IDs from the matching documents
+    const teamLeadIds = teamLeads.map((lead) => lead._id);
+    const userIds = users.map((user) => user._id);
+    const technologyIds = technologies.map((tech) => tech._id);
+
+    // Construct the query object to filter tasks based on the matching IDs
+    const queryObject = {
+      $or: [
+        { teamLeadId: { $in: teamLeadIds } },
+        { userId: { $in: userIds } },
+        { technologyId: { $in: technologyIds } },
+      ],
+    };
+
+    // Fetch tasks that match the query object
+    const tasks = await Task.find(queryObject).populate("teamLeadId technologyId userId");
+
     return res.status(200).json({ status: "success", tasks });
   } catch (error) {
     return res.status(500).json({ status: "fail", message: error.message });
@@ -299,3 +351,18 @@ export const deleteTask = async (req, res) => {
   }
 };
 
+export const search = async (req, res) => {
+  try {
+    const searchTerm = req.query.name; // Assuming the search term is passed as a query parameter named 'term'
+    console.log(searchTerm, "------------------------");
+    const data = await Task.find({ name: { $regex: searchTerm, $options: "i" } });
+    console.log(data, "--------------------------");
+
+    return res.status(200).json({
+      status: "success",
+      data,
+    });
+  } catch (error) {
+    return res.status(500).json({ status: "fail", message: error.message });
+  }
+};

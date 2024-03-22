@@ -1,8 +1,9 @@
 import express from "express";
+import "./config/db.js";
 import cors from "cors";
 import methodOverride from "method-override";
 import routers from "./routes/taskRoute.js";
-import "./config/db.js";
+
 
 const app = express();
 app.use(methodOverride("_method"));

@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const DB = "mongodb://localhost:27017/taskManagementdb";
+const DB = "mongodb://127.0.0.1:27017/taskManagementdb";
 
 mongoose
   .connect(DB, {})
@@ -10,3 +10,4 @@ mongoose
   .catch((err) => {
     console.log("Error in connection with the database: " + err);
   });
+

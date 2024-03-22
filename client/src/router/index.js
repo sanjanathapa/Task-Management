@@ -2,7 +2,8 @@ import React from "react";
 import { Routes, Route, Navigate, Outlet } from "react-router-dom";
 
 import LoginForm from "../components/LoginForm";
-import TaskLists from "../components/TaskLists.js";
+// import TaskLists from "../components/TaskLists.js";
+import TaskLists from "../components/TaskManagement/index.js";
 import ProfilePhotoUpload from "../components/ProfilePhotoUpload/index.js";
 import { TaskManagementCurrentUser } from "../utils/validations.js";
 
