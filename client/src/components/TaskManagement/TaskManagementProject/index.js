@@ -1,20 +1,19 @@
-import React, { useState, useReducer } from "react";
-import { TextField, MenuItem, Button } from "@mui/material";
-import Modal from "react-modal";
-import { useAddTaskMutation } from "../../../Api/AddTask.js";
-import { toast } from "react-toastify";
-import { handleError } from "../../../utils/handleError.js";
-import { useGetTaskQuery } from "../../../Api/GetTaskLists";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
-import { useDeleteTaskMutation } from "../../../Api/DeleteTask";
-import { useUpdateTaskMutation } from "../../../Api/UpdateTask.js";
-import { useGetTechnologyQuery } from "../../../Api/GetTechnology.js";
-import "../../TaskManagement/tablec.css";
-import "../../../App.css";
+import { Button, CircularProgress, MenuItem, TextField } from "@mui/material";
 import { get } from "lodash";
-import { CircularProgress } from "@mui/material";
+import React, { useReducer, useState } from "react";
+import Modal from "react-modal";
+import { toast } from "react-toastify";
+import { useAddTaskMutation } from "../../../Api/AddTask.js";
+import { useDeleteTaskMutation } from "../../../Api/DeleteTask";
 import { useGetUsersQuery } from "../../../Api/GetAllUsers.js";
+import { useGetTaskQuery } from "../../../Api/GetTaskLists";
+import { useGetTechnologyQuery } from "../../../Api/GetTechnology.js";
+import { useUpdateTaskMutation } from "../../../Api/UpdateTask.js";
+import "../../../App.css";
+import { handleError } from "../../../utils/handleError.js";
+import "../../TaskManagement/tablec.css";
 
 const customStyles = {
   content: {
@@ -27,10 +26,10 @@ const customStyles = {
   },
 };
 
-const TaskManagementProject = () => {
+const TaskManagementProject = ({ searchQuery = "" }) => {
   const [openModal, setOpenModal] = useState(false);
 
-  const { data, isLoading, refetch: getTableData } = useGetTaskQuery();
+  const { data, isLoading, refetch: getTableData } = useGetTaskQuery(searchQuery);
   const [addTask] = useAddTaskMutation();
   const [deleteTask] = useDeleteTaskMutation();
   const [updateTask] = useUpdateTaskMutation();
@@ -130,6 +129,7 @@ const TaskManagementProject = () => {
   };
 
   if (isLoading) return <CircularProgress sx={{ color: "black" }} />;
+
   return (
     <div>
       <button
@@ -153,7 +153,7 @@ const TaskManagementProject = () => {
               <th>Delete</th>
               <th>Edit</th>
             </tr>
-            {data?.tasks?.map((item, i) => (
+            {(data)?.tasks?.map((item, i) => (
               <tr key={i}>
                 <td>{get(item, "teamLeadId.name", "")}</td>
                 <td>{get(item, "technologyId.technology", "")}</td>
