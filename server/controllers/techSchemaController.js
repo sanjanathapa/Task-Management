@@ -178,7 +178,9 @@ export const deleteTech = async (req, res) => {
       return res.status(404).json({ message: "Task not found" });
     }
 
-    return res.status(200).json({ status: "success", message: "Task deleted successfully" });
+    return res
+      .status(200)
+      .json({ status: "success", message: "Task deleted successfully" });
   } catch (error) {
     return res.status(500).json({ status: "fail", message: error.message });
   }
@@ -193,10 +195,16 @@ export const updateTech = async (req, res) => {
     const { technology } = req.body;
 
     if (!technology) {
-      return res.status(400).json({ message: "Technology field required for update" });
+      return res
+        .status(400)
+        .json({ message: "Technology field required for update" });
     }
 
-    const updatedTech = await TechSchema.findByIdAndUpdate({ _id: id }, { technology }, { new: true });
+    const updatedTech = await TechSchema.findByIdAndUpdate(
+      { _id: id },
+      { technology },
+      { new: true }
+    );
 
     if (!updatedTech) {
       return res.status(404).json({ message: "Task not found" });
@@ -242,7 +250,9 @@ export const createTask = async (req, res) => {
     // Send back the whole response with populated fields
     res.status(201).json({ success: true, data: newTask });
   } catch (err) {
-    res.status(500).json({ success: false, message: "try again", error: err.message });
+    res
+      .status(500)
+      .json({ success: false, message: "try again", error: err.message });
   }
 };
 
@@ -312,55 +322,53 @@ export const createTask = async (req, res) => {
 
 export const getAllTasks = async (req, res) => {
   try {
-    // Get the values from the query parameters
     const { name, technology } = req.query;
+    let query = {};
 
-    if (Object.keys(req.query).length === 0) {
-      // Fetching all task if query object khaali
-      const tasks = await Task.find().populate("teamLeadId technologyId userId");
-      return res.status(200).json({ status: "success", tasks });
-    }
-    // Initialize variables to store search results
-    let teamLeadIds = [];
-    let userIds = [];
-    let technologyIds = [];
+    if (name || technology) {
+      let searchCriteria = [];
 
-    // Perform partial text search for name in TeamLead and User collections
-    if (name) {
-      const [teamLeads, users] = await Promise.all([
-        TeamLead.find({ name: { $regex: name, $options: "i" } }),
-        User.find({ name: { $regex: name, $options: "i" } }),
-      ]);
-
-      teamLeadIds = teamLeads.map((lead) => lead._id);
-      userIds = users.map((user) => user._id);
-    }
-
-    // Perform partial text search for technology in TechSchema collection
-    if (technology) {
-      const tech = await TechSchema.findOne({ technology: { $regex: technology, $options: "i" } });
-      if (tech) {
-        technologyIds.push(tech._id);
+      if (name) {
+        searchCriteria.push({
+          $or: [
+            { teamLeadId: { $in: await findIds(TeamLead, "name", name) } },
+            { userId: { $in: await findIds(User, "name", name) } },
+          ],
+        });
       }
+
+      if (technology) {
+        const techId = await findTechId(technology);
+        if (techId) {
+          searchCriteria.push({ technologyId: techId });
+        }
+      }
+
+      query = { $and: searchCriteria };
     }
 
-    // Construct the query object to filter tasks based on the matching IDs
-    const queryObject = {
-      $or: [
-        { teamLeadId: { $in: teamLeadIds } },
-        { userId: { $in: userIds } },
-        { technologyId: { $in: technologyIds } },
-      ],
-    };
-
-    // Fetch tasks that match the query object
-    const tasks = await Task.find(queryObject).populate("teamLeadId technologyId userId");
+    const tasks = await Task.find(query).populate(
+      "teamLeadId technologyId userId"
+    );
 
     return res.status(200).json({ status: "success", tasks });
   } catch (error) {
     return res.status(500).json({ status: "fail", message: error.message });
   }
 };
+
+async function findIds(Model, field, value) {
+  const regex = new RegExp(value, "i");
+  const docs = await Model.find({ [field]: { $regex: regex } }).select("_id");
+  return docs.map((doc) => doc._id);
+}
+
+async function findTechId(technology) {
+  const tech = await TechSchema.findOne({
+    technology: { $regex: new RegExp(technology, "i") },
+  });
+  return tech ? tech._id : null;
+}
 
 export const updateTask = async (req, res) => {
   try {
@@ -369,10 +377,16 @@ export const updateTask = async (req, res) => {
     const { task } = req.body;
     console.log("task>>>>>>>>>>>>>>>>>>>>>>", task);
     if (!task) {
-      return res.status(400).json({ message: "Task field required for update" });
+      return res
+        .status(400)
+        .json({ message: "Task field required for update" });
     }
 
-    const updatedTask = await Task.findByIdAndUpdate({ _id: id }, { task }, { new: true });
+    const updatedTask = await Task.findByIdAndUpdate(
+      { _id: id },
+      { task },
+      { new: true }
+    );
     console.log("updateTask>>>>>>>>>>>>>", updatedTask);
     if (!updatedTask) {
       return res.status(404).json({ message: "Task not found" });
@@ -397,7 +411,9 @@ export const deleteTask = async (req, res) => {
       return res.status(404).json({ message: "Task not found" });
     }
 
-    return res.status(200).json({ status: "success", message: "Task deleted successfully" });
+    return res
+      .status(200)
+      .json({ status: "success", message: "Task deleted successfully" });
   } catch (error) {
     return res.status(500).json({ status: "fail", message: error.message });
   }
@@ -407,7 +423,9 @@ export const search = async (req, res) => {
   try {
     const searchTerm = req.query.name; // Assuming the search term is passed as a query parameter named 'term'
     console.log(searchTerm, "------------------------");
-    const data = await Task.find({ name: { $regex: searchTerm, $options: "i" } });
+    const data = await Task.find({
+      name: { $regex: searchTerm, $options: "i" },
+    });
     console.log(data, "--------------------------");
 
     return res.status(200).json({
