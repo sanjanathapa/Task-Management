@@ -14,13 +14,7 @@ export const StyledBox = styled(Box)(() => ({
 
 const TopBar = ({
   searchInput = "",
-  showOptions = false,
-  showCancelIcon = false,
-  searchTableData = {},
-  onClick = noop,
-  handleKeyChange = noop,
   handleChange = noop,
-  reset = noop,
 }) => {
 
   return (
@@ -39,14 +33,9 @@ const TopBar = ({
     >
       <Grid item md={3} xs={12}>
         <SearchBar
-          records={searchTableData}
           searchInput={searchInput}
-          showOptions={showOptions}
-          showCancelIcon={showCancelIcon}
-          onClick={onClick}
-          handleKeyChange={handleKeyChange}
           handleChange={handleChange}
-          reset={reset}
+
         />
       </Grid>
       <Grid item>
