@@ -135,8 +135,8 @@ const TaskManagementProject = () => {
       <button
         className="d-flex mx-auto my-3"
         onClick={(e) => {
-          resetState();
-          handleTaskCreateModal(e);
+          resetState(); // Call the resetState function
+          handleTaskCreateModal(e); // Call the handleTaskCreateModal function
         }}
       >
         Add new task

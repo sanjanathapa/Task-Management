@@ -1,9 +1,9 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 import TopBar from "./TopBar/index.js";
 import { Paper, Box } from "@mui/material";
 import TaskManagementProject from "./TaskManagementProject/index.js";
 const TaskLists = () => {
-  const [searchInput, setSearchInput] = useState("")
+  const [searchInput, setSearchInput] = useState("");
   return (
     <Paper display="block" justifyContent="flex-start" sx={{ borderRadius: 2, marginBottom: "6px" }}>
       <Box

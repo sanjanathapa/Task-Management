@@ -25,7 +25,7 @@ const router = express.Router();
 router.post("/login", login);
 
 //route protection and authorization
-router.post( "/createUser", protect, restrictTo( "TL" ), createUser );
+router.post("/createUser", protect, restrictTo("TL"), createUser);
 router.get("/user", protect, restrictTo("TL"), getAllUsers);
 
 // //technology
@@ -42,10 +42,12 @@ router.get("/profile/:id", protect, restrictTo("TL"), getPhoto);
 
 // //Task create
 router.post("/task", protect, restrictTo("TL"), createTask);
-router.get("/task", protect, getAllTasks);
+router.get("/task", protect, restrictTo("TL"), getAllTasks);
 router.put("/task/:id", protect, restrictTo("TL"), updateTask);
-router.delete( "/task/:id", protect, restrictTo( "TL" ), deleteTask );
+router.delete("/task/:id", protect, restrictTo("TL"), deleteTask);
 
 // router.get("/search", search)
 
 export default router;
+
+ 
