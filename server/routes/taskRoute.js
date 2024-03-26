@@ -1,4 +1,6 @@
 import express from "express";
+import { login, protect, restrictTo } from "../controllers/authController.js";
+import { healthCheck } from "../controllers/healthCheckController.js";
 import {
   createTask,
   createTeamLead,
@@ -8,18 +10,17 @@ import {
   getAllTasks,
   getAllTeamLeads,
   getAllTech,
-  getPhoto,
-  search,
-  updateTask,
+  getPhoto, updateTask,
   updateTech,
-  uploadUserPhoto,
+  uploadUserPhoto
 } from "../controllers/techSchemaController.js";
 import { createUser, getAllUsers } from "../controllers/userSchemaController.js";
-import { login, protect, restrictTo } from "../controllers/authController.js";
 
 const router = express.Router();
 
 // console.log(router.delete, ">>>>>>>>>>>>>>>>>");
+// health-check
+router.get("/health-check", healthCheck);
 
 //login
 router.post("/login", login);

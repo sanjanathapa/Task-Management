@@ -1,9 +1,16 @@
+import { Box, Paper } from "@mui/material";
 import React, { useState } from "react";
-import TopBar from "./TopBar/index.js";
-import { Paper, Box } from "@mui/material";
 import TaskManagementProject from "./TaskManagementProject/index.js";
+import TopBar from "./TopBar/index.js";
+
+
 const TaskLists = () => {
   const [searchInput, setSearchInput] = useState("");
+
+  const handleQueryChange = (e) => {
+    setSearchInput(e.target.value);
+  };
+
   return (
     <Paper display="block" justifyContent="flex-start" sx={{ borderRadius: 2, marginBottom: "6px" }}>
       <Box
@@ -15,9 +22,9 @@ const TaskLists = () => {
           },
         }}
       >
-        <TopBar />
+        <TopBar searchInput={searchInput} handleChange={handleQueryChange} />
       </Box>
-      <TaskManagementProject />
+      <TaskManagementProject searchQuery={searchInput} />
     </Paper>
   );
 };
