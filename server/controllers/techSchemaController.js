@@ -256,135 +256,72 @@ export const createTask = async (req, res) => {
   }
 };
 
-// export const getAllTasks = async (req, res) => {
-//   //get the value from query param
-//   const { name, technology } = req.query;
-//   console.log(req.query, "jkjkjk")
-//   let term = {};
-//   console.log(term , "term")
-//   if (name) {
-//     term.name = name;
-//   }
-//   if (technology) {
-//     term.technology = technology;
-//   }
-
-//   console.log(term);
-//   try {
-//     const tasks = await Task.find(term).populate("teamLeadId technologyId userId");
-//     console.log("task>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", tasks);
-//     return res.status(200).json({ status: "success", tasks });
-//   } catch (error) {
-//     return res.status(500).json({ status: "fail", message: error.message });
-//   }
-// };
-
-// export const getAllTasks = async (req, res) => {
-//   try {
-//     // Get the value from the query parameter
-//     const { name, technology } = req.query;
-//     // Checking if req.query is empty
-//     if (Object.keys(req.query).length === 0) {
-//       // Fetching all task if query object khaali
-//       const tasks = await Task.find().populate("teamLeadId technologyId userId");
-//       return res.status(200).json({ status: "success", tasks });
-//     }
-//     console.log(technology, "000000000000000000000000000000000");
-//     // Find team lead, user, and technology documents that match the query
-//     const [teamLeads, users, technologies] = await Promise.all([
-//       TeamLead.find({ name: name }),
-//       User.find({ name: name }),
-//       TechSchema.find({ technology: technology }),
-//     ]);
-
-//     // Extract IDs from the matching documents
-//     const teamLeadIds = teamLeads.map((lead) => lead._id);
-//     const userIds = users.map((user) => user._id);
-//     const technologyIds = technologies.map((tech) => tech._id);
-
-//     // Construct the query object to filter tasks based on the matching IDs
-//     const queryObject = {
-//       $or: [
-//         { teamLeadId: { $in: teamLeadIds } },
-//         { userId: { $in: userIds } },
-//         { technologyId: { $in: technologyIds } },
-//       ],
-//     };
-
-//     // Fetch tasks that match the query object
-//     const tasks = await Task.find(queryObject).populate("teamLeadId technologyId userId");
-
-//     return res.status(200).json({ status: "success", tasks });
-//   } catch (error) {
-//     return res.status(500).json({ status: "fail", message: error.message });
-//   }
-// };
-
 export const getAllTasks = async (req, res) => {
-  try {
-    const { search } = req.query;
-
-    const results = await Task.find({
-      $or: [
-        { teamLeadId: { $regex: new RegExp(search, "i") } },
-        { userId: { $regex: new RegExp(search, "i") } },
-        { technologyId: { $regex: new RegExp(search, "i") } },
-      ],
-    }).populate("teamLeadId technologyId userId");
-
-    return res.status(200).json({ status: "success", tasks: results });
-  } catch (error) {
-    return res.status(500).json({ status: "fail", message: error.message });
-  }
-
   // try {
-  //   const { name, technology } = req.query;
+  //   const { search } = req.query;
   //   let query = {};
 
-  //   if (name || technology) {
-  //     let searchCriteria = [];
-
-  //     if (name) {
-  //       searchCriteria.push({
-  //         $or: [
-  //           { teamLeadId: { $in: await findIds(TeamLead, "name", name) } },
-  //           { userId: { $in: await findIds(User, "name", name) } },
-  //         ],
-  //       });
-  //     }
-
-  //     if (technology) {
-  //       const techId = await findTechId(technology);
-  //       if (techId) {
-  //         searchCriteria.push({ technologyId: techId });
-  //       }
-  //     }
-
-  //     query = { $and: searchCriteria };
+  //   if (search) {
+  //     query.$or = [{ "userId.name": { $regex: search, $options: "i" } }];
   //   }
 
   //   const tasks = await Task.find(query).populate(
   //     "teamLeadId technologyId userId"
   //   );
 
-  //   return res.status(200).json({ status: "success", tasks });
+  //   return res.status(200).json({ status: "success", tasks: tasks });
   // } catch (error) {
+  //   console.log("error", error);
   //   return res.status(500).json({ status: "fail", message: error.message });
   // }
+
+  try {
+    const { search } = req.query;
+
+    let tasks;
+
+    if (search) {
+      tasks = await Task.aggregate([
+        {
+          $lookup: {
+            from: "users",
+            localField: "userId",
+            foreignField: "_id",
+            as: "user",
+          },
+        },
+
+        {
+          $match: {
+            $or: [
+              { task: { $regex: search, $options: "i" } },
+              { "user.name": { $regex: search, $options: "i" } },
+            ],
+          },
+        },
+
+        {
+          $project: {
+            teamLeadId: 1,
+            technologyId: 1,
+            task: 1,
+            userId: {
+              $arrayElemAt: ["$user", 0],
+            },
+            createdAt: 1,
+          },
+        },
+      ]);
+    } else {
+      tasks = await Task.find().populate("teamLeadId technologyId userId");
+    }
+
+    return res.status(200).json({ status: "success", tasks });
+  } catch (error) {
+    console.log("error", error);
+    return res.status(500).json({ status: "fail", message: error.message });
+  }
 };
-
-async function findIds(Model, field, value) {
-  const regex = new RegExp(value, "i");
-  const docs = await Model.find({ [field]: { $regex: regex } }).select("_id");
-  return docs.map((doc) => doc._id);
-}
-
-async function findTechId(technology) {
-  const tech = await TechSchema.findOne({
-    technology: { $regex: new RegExp(technology, "i") },
-  });
-  return tech ? tech._id : null;
-}
 
 export const updateTask = async (req, res) => {
   try {

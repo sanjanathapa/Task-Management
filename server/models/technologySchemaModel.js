@@ -8,4 +8,4 @@ const technologySchemaModel = new mongoose.Schema({
   },
 });
 
-export default mongoose.model("technology", technologySchemaModel);
+export default mongoose.model("Technology", technologySchemaModel);
