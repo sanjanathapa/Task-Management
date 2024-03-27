@@ -257,82 +257,62 @@ export const createTask = async (req, res) => {
 };
 
 export const getAllTasks = async (req, res) => {
-  // try {
-  //   const { search } = req.query;
-  //   let query = {};
-
-  //   if (search) {
-  //     query.$or = [{ "userId.name": { $regex: search, $options: "i" } }];
-  //   }
-
-  //   const tasks = await Task.find(query).populate(
-  //     "teamLeadId technologyId userId"
-  //   );
-
-  //   return res.status(200).json({ status: "success", tasks: tasks });
-  // } catch (error) {
-  //   console.log("error", error);
-  //   return res.status(500).json({ status: "fail", message: error.message });
-  // }
-
   try {
     const { search } = req.query;
 
-    let tasks;
+    const query = [
+      {
+        $lookup: {
+          from: "users",
+          localField: "userId",
+          foreignField: "_id",
+          as: "user",
+        },
+      },
+
+      {
+        $lookup: {
+          from: "teamleads",
+          localField: "teamLeadId",
+          foreignField: "_id",
+          as: "teamLead",
+        },
+      },
+
+      {
+        $lookup: {
+          from: "technologies",
+          localField: "technologyId",
+          foreignField: "_id",
+          as: "technology",
+        },
+      },
+
+      // {
+      //   $project: {
+      //     teamLeadId: 1,
+      //     technologyId: 1,
+      //     task: 1,
+      //     userId: {
+      //       $arrayElemAt: ["$user", 0],
+      //     },
+      //     createdAt: 1,
+      //   },
+      // },
+    ];
 
     if (search) {
-      tasks = await Task.aggregate([
-        {
-          $lookup: {
-            from: "users",
-            localField: "userId",
-            foreignField: "_id",
-            as: "user",
-          },
+      query.push({
+        $match: {
+          $or: [
+            { task: { $regex: search, $options: "i" } },
+            { "user.name": { $regex: search, $options: "i" } },
+          ],
         },
-
-        {
-          $lookup: {
-            from: "teamleads",
-            localField: "teamLeadId",
-            foreignField: "_id",
-            as: "teamLead",
-          },
-        },
-
-        {
-          $lookup: {
-            from: "technologies",
-            localField: "technologyId",
-            foreignField: "_id",
-            as: "technology",
-          },
-        },
-
-        {
-          $match: {
-            $or: [
-              { task: { $regex: search, $options: "i" } },
-              { "user.name": { $regex: search, $options: "i" } },
-            ],
-          },
-        },
-
-        // {
-        //   $project: {
-        //     teamLeadId: 1,
-        //     technologyId: 1,
-        //     task: 1,
-        //     userId: {
-        //       $arrayElemAt: ["$user", 0],
-        //     },
-        //     createdAt: 1,
-        //   },
-        // },
-      ]);
-    } else {
-      tasks = await Task.find().populate("teamLeadId technologyId userId");
+      });
     }
+
+    const tasks = await Task.aggregate(query);
 
     return res.status(200).json({ status: "success", tasks });
   } catch (error) {
