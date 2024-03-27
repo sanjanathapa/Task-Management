@@ -292,6 +292,24 @@ export const getAllTasks = async (req, res) => {
         },
 
         {
+          $lookup: {
+            from: "teamleads",
+            localField: "teamLeadId",
+            foreignField: "_id",
+            as: "teamLead",
+          },
+        },
+
+        {
+          $lookup: {
+            from: "technologies",
+            localField: "technologyId",
+            foreignField: "_id",
+            as: "technology",
+          },
+        },
+
+        {
           $match: {
             $or: [
               { task: { $regex: search, $options: "i" } },
@@ -300,17 +318,17 @@ export const getAllTasks = async (req, res) => {
           },
         },
 
-        {
-          $project: {
-            teamLeadId: 1,
-            technologyId: 1,
-            task: 1,
-            userId: {
-              $arrayElemAt: ["$user", 0],
-            },
-            createdAt: 1,
-          },
-        },
+        // {
+        //   $project: {
+        //     teamLeadId: 1,
+        //     technologyId: 1,
+        //     task: 1,
+        //     userId: {
+        //       $arrayElemAt: ["$user", 0],
+        //     },
+        //     createdAt: 1,
+        //   },
+        // },
       ]);
     } else {
       tasks = await Task.find().populate("teamLeadId technologyId userId");
