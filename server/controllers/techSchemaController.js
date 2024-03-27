@@ -322,39 +322,55 @@ export const createTask = async (req, res) => {
 
 export const getAllTasks = async (req, res) => {
   try {
-    const { name, technology } = req.query;
-    let query = {};
+    const { search } = req.query;
 
-    if (name || technology) {
-      let searchCriteria = [];
+    const results = await Task.find({
+      $or: [
+        { teamLeadId: { $regex: new RegExp(search, "i") } },
+        { userId: { $regex: new RegExp(search, "i") } },
+        { technologyId: { $regex: new RegExp(search, "i") } },
+      ],
+    }).populate("teamLeadId technologyId userId");
 
-      if (name) {
-        searchCriteria.push({
-          $or: [
-            { teamLeadId: { $in: await findIds(TeamLead, "name", name) } },
-            { userId: { $in: await findIds(User, "name", name) } },
-          ],
-        });
-      }
-
-      if (technology) {
-        const techId = await findTechId(technology);
-        if (techId) {
-          searchCriteria.push({ technologyId: techId });
-        }
-      }
-
-      query = { $and: searchCriteria };
-    }
-
-    const tasks = await Task.find(query).populate(
-      "teamLeadId technologyId userId"
-    );
-
-    return res.status(200).json({ status: "success", tasks });
+    return res.status(200).json({ status: "success", tasks: results });
   } catch (error) {
     return res.status(500).json({ status: "fail", message: error.message });
   }
+
+  // try {
+  //   const { name, technology } = req.query;
+  //   let query = {};
+
+  //   if (name || technology) {
+  //     let searchCriteria = [];
+
+  //     if (name) {
+  //       searchCriteria.push({
+  //         $or: [
+  //           { teamLeadId: { $in: await findIds(TeamLead, "name", name) } },
+  //           { userId: { $in: await findIds(User, "name", name) } },
+  //         ],
+  //       });
+  //     }
+
+  //     if (technology) {
+  //       const techId = await findTechId(technology);
+  //       if (techId) {
+  //         searchCriteria.push({ technologyId: techId });
+  //       }
+  //     }
+
+  //     query = { $and: searchCriteria };
+  //   }
+
+  //   const tasks = await Task.find(query).populate(
+  //     "teamLeadId technologyId userId"
+  //   );
+
+  //   return res.status(200).json({ status: "success", tasks });
+  // } catch (error) {
+  //   return res.status(500).json({ status: "fail", message: error.message });
+  // }
 };
 
 async function findIds(Model, field, value) {
