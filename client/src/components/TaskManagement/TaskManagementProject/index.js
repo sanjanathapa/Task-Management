@@ -35,7 +35,7 @@ const TaskManagementProject = ({ searchQuery = "" }) => {
   const [updateTask] = useUpdateTaskMutation();
   const { data: getUserList } = useGetUsersQuery();
   const { data: techData } = useGetTechnologyQuery();
-  console.log(getUserList, ">>>>>>>>>>>>>>>>>>>>>>>data");
+  console.log(data, ">>>>>>>>>>>>>>>>>>>>>>>data");
 
   const [localState, setLocalState] = useReducer(
     (prevState, newState) => {
@@ -153,12 +153,12 @@ const TaskManagementProject = ({ searchQuery = "" }) => {
               <th>Delete</th>
               <th>Edit</th>
             </tr>
-            {(data)?.tasks?.map((item, i) => (
+            {data?.tasks?.map((item, i) => (
               <tr key={i}>
-                <td>{get(item, "teamLeadId.name", "")}</td>
-                <td>{get(item, "technologyId.technology", "")}</td>
+                <td>{get(item, "teamLead[0].name", "")}</td>
+                <td>{get(item, "technology[0].technology", "")}</td>
                 <td>{get(item, "task", "")}</td>
-                <td>{get(item, "userId.name", "")}</td>
+                <td>{get(item, "user[0].name", "")}</td>
                 <td onClick={() => handleDeleteTask(item)}>
                   <DeleteIcon />
                 </td>
@@ -181,7 +181,6 @@ const TaskManagementProject = ({ searchQuery = "" }) => {
                 select
               >
                 {techData?.technologies?.map((item, index) => {
-                  console.log("item>>>>>>>>>", item._id);
                   return (
                     <MenuItem
                       key={index}
@@ -202,7 +201,6 @@ const TaskManagementProject = ({ searchQuery = "" }) => {
             <div style={{ marginBottom: "20px" }}>
               <TextField label="Intern" name="intern" value={intern} onChange={onHandleChange} fullWidth select>
                 {getUserList?.user?.map((item, index) => {
-                  console.log("item>>>>>>>>>", item);
                   return (
                     <MenuItem
                       key={index}
