@@ -7,13 +7,11 @@ export const TaskManagementCurrentUser = () => {
       loginToken: get(state, "LoginSlice.loginToken", null),
       user: get(state, "LoginSlice.user", null),
     }),
-    shallowEqual,
+    shallowEqual
   );
 
   const localStorageToken = loginToken || localStorage.getItem("token");
-
-  const localStorageUser =
-    !!Object.keys(user).length || JSON.parse(localStorage.getItem("user"));
+  const localStorageUser = user || JSON.parse(localStorage.getItem("user"));
 
   return { localStorageToken, user: localStorageUser };
 };

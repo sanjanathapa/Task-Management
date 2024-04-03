@@ -10,9 +10,7 @@ export const login = async (req, res) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      return res
-        .status(400)
-        .json({ message: "Please provide email and password" });
+      return res.status(400).json({ message: "Please provide email and password" });
     }
     const user = await TeamLead.findOne({ email });
     if (!user) {
@@ -40,17 +38,12 @@ export const login = async (req, res) => {
 export const protect = async (req, res, next) => {
   //1. Getting token and check if it's there
   let token;
-  if (
-    req.headers.authorization &&
-    req.headers.authorization.startsWith("Bearer")
-  ) {
+  if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
     token = req.headers.authorization.split(" ")[1];
   }
 
   if (!token) {
-    return res
-      .status(401)
-      .json({ message: "you are not logged in! Please login to get access" });
+    return res.status(401).json({ message: "you are not logged in! Please login to get access" });
     //we return from this middleware and call the next one and in next() we gonna create an error
   }
   //2. Verification token
@@ -68,11 +61,13 @@ export const protect = async (req, res, next) => {
 
   //Grant Access to Protected Route
   req.user = currentUser;
+  console.log(req.user, ">>>>>>>>>>>>>>>>>>");
   next();
 };
 
 export const restrictTo = (...roles) => {
   return (req, res, next) => {
+    console.log("req>>>>>>>>>>>>>>>>>>>>>>>>>>>", req.user);
     if (!roles.includes(req.user.role)) {
       return res.status(403).json({
         message: "You are not allowed for this action",

@@ -65,6 +65,7 @@ export const uploadUserPhoto = async (req, res) => {
 };
 
 export const getPhoto = async (req, res) => {
+  console.log("req.params>>>>>>>>>>>>>>>", req.params, req.user);
   try {
     const { id } = req.params;
     console.log("response", id);

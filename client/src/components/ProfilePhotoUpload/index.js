@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useUploadImageMutation } from "../../Api/UploadImage";
 import { FormControl } from "react-bootstrap";
 import { toast } from "react-toastify";
@@ -9,15 +9,16 @@ import { TaskManagementCurrentUser } from "../../utils/validations";
 
 const ProfilePhotoUpload = () => {
   const { user } = TaskManagementCurrentUser();
-
   const [uploadProfile, { isLoading }] = useUploadImageMutation();
   const { data: profile, refetch } = useGetImageQuery(user._id);
-
   const onFileChange = (e) => {
     const file = e.target.files[0];
 
     handlePhoto(file);
   };
+  useEffect(() => {
+    refetch();
+  }, []);
 
   const handlePhoto = (uploadImage) => {
     if (uploadImage) {
@@ -49,17 +50,12 @@ const ProfilePhotoUpload = () => {
       />
 
       <label className="btn btn-primary">
-        <FormControl
-          type="file"
-          name="file"
-          style={{ display: "none" }}
-          onChange={onFileChange}
-        />
+        <FormControl type="file" name="file" style={{ display: "none" }} onChange={onFileChange} />
 
         {isLoading ? (
           <CircularProgress size={25} sx={{ scale: 0.2, color: "white" }} />
         ) : (
-          <>{user.photo ? "Edit Profile" : "Add Profile"}</>
+          <>{profile?.imageUrl ? "Edit Profile" : "Add Profile"}</>
         )}
       </label>
     </div>
