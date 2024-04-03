@@ -12,11 +12,7 @@ export const StyledBox = styled(Box)(() => ({
   cursor: "pointer",
 }));
 
-const TopBar = ({
-  searchInput = "",
-  handleChange = noop,
-}) => {
-
+const TopBar = ({ searchInput = "", handleChange = noop }) => {
   return (
     <Grid
       container
@@ -32,17 +28,13 @@ const TopBar = ({
       }}
     >
       <Grid item md={3} xs={12}>
-        <SearchBar
-          searchInput={searchInput}
-          handleChange={handleChange}
-
-        />
+        <SearchBar searchInput={searchInput} handleChange={handleChange} />
       </Grid>
       <Grid item>
         <Button
-                  size="medium"
-                  variant="outlined"
-                  sx={{marginLeft: "750px"}}
+          size="medium"
+          variant="outlined"
+          sx={{ marginLeft: "750px" }}
           startIcon={<AddIcon sx={{ width: 19 }} />}
           //   onClick={() => handleAddEditCaseStudyDialog()}
         >

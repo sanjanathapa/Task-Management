@@ -317,9 +317,7 @@ export const getAllTasks = async (req, res) => {
 export const updateTask = async (req, res) => {
   try {
     const { id } = req.params;
-    console.log("snajnajnjnajnajnjnajnjnjjnjnjnjnjnj", req.body);
     const { task } = req.body;
-    console.log("task>>>>>>>>>>>>>>>>>>>>>>", task);
     if (!task) {
       return res.status(400).json({ message: "Task field required for update" });
     }

@@ -10,9 +10,10 @@ import {
   getAllTasks,
   getAllTeamLeads,
   getAllTech,
-  getPhoto, updateTask,
+  getPhoto,
+  updateTask,
   updateTech,
-  uploadUserPhoto
+  uploadUserPhoto,
 } from "../controllers/techSchemaController.js";
 import { createUser, getAllUsers } from "../controllers/userSchemaController.js";
 
@@ -50,5 +51,3 @@ router.delete("/task/:id", protect, restrictTo("TL"), deleteTask);
 // router.get("/search", search)
 
 export default router;
-
- 

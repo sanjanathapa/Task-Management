@@ -3,13 +3,39 @@ import React, { useState } from "react";
 import TaskManagementProject from "./TaskManagementProject/index.js";
 import TopBar from "./TopBar/index.js";
 
-
 const TaskLists = () => {
   const [searchInput, setSearchInput] = useState("");
 
-  const handleQueryChange = (e) => {
-    setSearchInput(e.target.value);
+  const debounce = (func, delay) => {
+    let timeout;
+    return function () {
+      if (timeout) clearTimeout(timeout);
+      timeout = setTimeout(() => {
+        func();
+      }, delay);
+    };
   };
+
+  // const handleSearch = (value) => {
+  //   console.log("Searching for:", value);
+  // };
+
+  // const handleQueryChange = ( e ) => {
+  //   setSearchInput(e.target.value);
+  //   debouncedSearch(e.target.value);
+  // };
+
+  const handleSearch = (value) => {
+    console.log("Searching for:", value);
+  };
+
+  const handleQueryChange = (e) => {
+    const value = e.target.value;
+    console.log("value>>>>>>>>>>>>>>>>>>", value);
+    setSearchInput(value);
+    debouncedSearch(value);
+  };
+  const debouncedSearch = debounce(handleSearch, 3000);
 
   return (
     <Paper display="block" justifyContent="flex-start" sx={{ borderRadius: 2, marginBottom: "6px" }}>
