@@ -3,16 +3,41 @@ import React, { useState } from "react";
 import TaskManagementProject from "./TaskManagementProject/index.js";
 import TopBar from "./TopBar/index.js";
 
-
 const TaskLists = () => {
   const [searchInput, setSearchInput] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+
+  console.log("searchInput...........", searchInput);
+  console.log("debouncedSearch...........", debouncedSearch);
+
+  const debounce = (func, delay) => {
+    let timeout;
+
+    return function (...args) {
+      if (timeout) clearTimeout(timeout);
+
+      timeout = setTimeout(() => {
+        func(...args);
+      }, delay);
+    };
+  };
 
   const handleQueryChange = (e) => {
-    setSearchInput(e.target.value);
+    const value = e.target.value;
+    setSearchInput(value);
+    debounce(getTaskData, 2000)(searchInput);
+  };
+
+  const getTaskData = (searchQuery) => {
+    setDebouncedSearch(searchQuery);
   };
 
   return (
-    <Paper display="block" justifyContent="flex-start" sx={{ borderRadius: 2, marginBottom: "6px" }}>
+    <Paper
+      display="block"
+      justifyContent="flex-start"
+      sx={{ borderRadius: 2, marginBottom: "6px" }}
+    >
       <Box
         sx={{
           "& .MuiTabPanel-root": {
@@ -24,7 +49,7 @@ const TaskLists = () => {
       >
         <TopBar searchInput={searchInput} handleChange={handleQueryChange} />
       </Box>
-      <TaskManagementProject searchQuery={searchInput} />
+      <TaskManagementProject searchQuery={debouncedSearch} />
     </Paper>
   );
 };
