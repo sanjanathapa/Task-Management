@@ -35,7 +35,7 @@ const TaskManagementProject = ({ searchQuery = "" }) => {
   const [updateTask] = useUpdateTaskMutation();
   const { data: users } = useGetUsersQuery();
   const { data: techData } = useGetTechnologyQuery();
-  console.log(users, ">>>>>>>>>>>>>>>>>>>>>>>data");
+  // console.log(users, ">>>>>>>>>>>>>>>>>>>>>>>data");
 
   const [localState, setLocalState] = useReducer(
     (prevState, newState) => {
@@ -58,7 +58,7 @@ const TaskManagementProject = ({ searchQuery = "" }) => {
   };
 
   const onHandleChange = (e) => {
-    console.log("eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee", e.target);
+    // console.log("eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee", e.target);
     const { name, value } = e.target;
     setLocalState({ [name]: value });
   };
@@ -201,7 +201,7 @@ const TaskManagementProject = ({ searchQuery = "" }) => {
             <div style={{ marginBottom: "20px" }}>
               <TextField label="Intern" name="intern" value={intern} onChange={onHandleChange} fullWidth select>
                 {users?.user?.map((item, index) => {
-                  console.log("item>>>>>>>>>", item);
+                  {/* console.log("item>>>>>>>>>", item); */}
                   return (
                     <MenuItem
                       key={index}

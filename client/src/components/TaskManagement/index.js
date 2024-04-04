@@ -3,42 +3,30 @@ import React, { useState } from "react";
 import TaskManagementProject from "./TaskManagementProject/index.js";
 import TopBar from "./TopBar/index.js";
 
+let timeout;
+
 const TaskLists = () => {
   const [searchInput, setSearchInput] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
 
-  const debounce = (func, delay) => {
-    let timeout;
-    return function () {
-      if (timeout) clearTimeout(timeout);
-      timeout = setTimeout(() => {
-        func();
-      }, delay);
-    };
-  };
-
-  // const handleSearch = (value) => {
-  //   console.log("Searching for:", value);
-  // };
-
-  // const handleQueryChange = ( e ) => {
-  //   setSearchInput(e.target.value);
-  //   debouncedSearch(e.target.value);
-  // };
-
-  const handleSearch = (value) => {
-    console.log("Searching for:", value);
-  };
+  console.log("searchInput...........", searchInput);
+  console.log("debouncedSearch...........", debouncedSearch);
 
   const handleQueryChange = (e) => {
     const value = e.target.value;
-    console.log("value>>>>>>>>>>>>>>>>>>", value);
     setSearchInput(value);
-    debouncedSearch(value);
+
+    if (timeout) clearTimeout(timeout);
+
+    timeout = setTimeout(() => setDebouncedSearch(value), 2000);
   };
-  const debouncedSearch = debounce(handleSearch, 3000);
 
   return (
-    <Paper display="block" justifyContent="flex-start" sx={{ borderRadius: 2, marginBottom: "6px" }}>
+    <Paper
+      display="block"
+      justifyContent="flex-start"
+      sx={{ borderRadius: 2, marginBottom: "6px" }}
+    >
       <Box
         sx={{
           "& .MuiTabPanel-root": {
@@ -50,7 +38,7 @@ const TaskLists = () => {
       >
         <TopBar searchInput={searchInput} handleChange={handleQueryChange} />
       </Box>
-      <TaskManagementProject searchQuery={searchInput} />
+      <TaskManagementProject searchQuery={debouncedSearch} />
     </Paper>
   );
 };
