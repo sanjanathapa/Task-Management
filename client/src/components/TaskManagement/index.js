@@ -3,6 +3,8 @@ import React, { useState } from "react";
 import TaskManagementProject from "./TaskManagementProject/index.js";
 import TopBar from "./TopBar/index.js";
 
+let timeout;
+
 const TaskLists = () => {
   const [searchInput, setSearchInput] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
@@ -10,26 +12,13 @@ const TaskLists = () => {
   console.log("searchInput...........", searchInput);
   console.log("debouncedSearch...........", debouncedSearch);
 
-  const debounce = (func, delay) => {
-    let timeout;
-
-    return function (...args) {
-      if (timeout) clearTimeout(timeout);
-
-      timeout = setTimeout(() => {
-        func(...args);
-      }, delay);
-    };
-  };
-
   const handleQueryChange = (e) => {
     const value = e.target.value;
     setSearchInput(value);
-    debounce(getTaskData, 2000)(searchInput);
-  };
 
-  const getTaskData = (searchQuery) => {
-    setDebouncedSearch(searchQuery);
+    if (timeout) clearTimeout(timeout);
+
+    timeout = setTimeout(() => setDebouncedSearch(value), 2000);
   };
 
   return (
